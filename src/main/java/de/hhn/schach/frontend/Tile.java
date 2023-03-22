@@ -14,25 +14,26 @@ import java.awt.image.BufferedImage;
 public class Tile extends JButton {
     private final Vec2 pos;
     private final boolean isWhite;
+    private Point translatedPos;
     Window window;
     private Piece piece = null;
     private boolean mousePressed = false;
     private boolean hovering = false;
-    private Point cursorPos = new Point(0, 0);
+    private Point previousPoint = new Point(0, 0);
 
     public Tile(Vec2 pos, Window window) {
         this.window = window;
         this.pos = pos;
         this.isWhite = (pos.getX() + pos.getY() + 1) % 2 == 0;
-        this.setBounds(pos.getY() * tileSize(), (7 - pos.getX()) * tileSize(), tileSize(), tileSize());
+        translatedPos = new Point(pos.getY() * tileSize(), (7 - pos.getX()) * tileSize());
+        this.setBounds(translatedPos.x, translatedPos.y, tileSize(), tileSize());
         this.setContentAreaFilled(false);
         this.setBorderPainted(false);
         this.addMouseListener(mouseListener());
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                cursorPos = e.getPoint();
-                System.out.println("Mouse dragged (" + pos + ") : " + cursorPos);
+                translatedPos.translate((int) (e.getPoint().getX() - previousPoint.getX()), (int) (e.getPoint().getY() - previousPoint.getY()));
             }
         });
         window.add(this);
@@ -54,6 +55,7 @@ public class Tile extends JButton {
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == 1 && hovering) {
                     mousePressed = true;
+                    previousPoint = e.getPoint();
                 }
             }
 
@@ -61,6 +63,7 @@ public class Tile extends JButton {
             public void mouseReleased(MouseEvent e) {
                 if (e.getButton() == 1 && mousePressed) {
                     mousePressed = false;
+                    calcPosition();
                 }
             }
         };
@@ -83,28 +86,23 @@ public class Tile extends JButton {
         return new ImageIcon(img);
     }
 
+    private void calcPosition(){
+        if (window.getContentPane().getHeight() > window.getContentPane().getWidth()) {
+            translatedPos.x = pos.getY() * tileSize();
+            translatedPos.y = (7 - pos.getX()) * tileSize() + ((window.getContentPane().getHeight() - window.getContentPane().getWidth()) / 2);
+        }
+        if (window.getContentPane().getHeight() < window.getContentPane().getWidth()) {
+            translatedPos.x = pos.getY() * tileSize() + ((window.getContentPane().getWidth() - window.getContentPane().getHeight()) / 2);
+            translatedPos.y = (7 - pos.getX()) * tileSize();
+        }
+    }
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         this.setIcon(this.getImg());
-        if (!mousePressed) {
-            if (window.getContentPane().getHeight() > window.getContentPane().getWidth()) {
-                this.setBounds(
-                        pos.getY() * tileSize(),
-                        (7 - pos.getX()) * tileSize() + ((window.getContentPane().getHeight() - window.getContentPane().getWidth()) / 2),
-                        tileSize(), tileSize()
-                );
-            }
-            if (window.getContentPane().getHeight() < window.getContentPane().getWidth()) {
-                this.setBounds(
-                        pos.getY() * tileSize() + ((window.getContentPane().getWidth() - window.getContentPane().getHeight()) / 2),
-                        (7 - pos.getX()) * tileSize(),
-                        tileSize(), tileSize()
-                );
-            }
-        } else {
-            this.setBounds(cursorPos.x - tileSize() / 2, cursorPos.y - tileSize() / 2, tileSize(), tileSize());
-        }
+        calcPosition();
+        this.setBounds(translatedPos.x, translatedPos.y, tileSize(), tileSize());
     }
 
     private ImageIcon getImg() {
