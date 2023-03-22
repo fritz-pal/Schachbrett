@@ -1,9 +1,13 @@
-package de.hhn.frontend;
+package de.hhn.schach.frontend;
+
+import de.hhn.schach.Board;
+import de.hhn.schach.Vec2;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class Window extends JFrame {
+
     public Window() {
         super();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -17,9 +21,15 @@ public class Window extends JFrame {
 
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
-                Tile tile = new Tile(x * 100, y * 100, 100, (x + y) % 2 == 0);
-                this.add(tile);
+                Vec2 pos = new Vec2(x, y);
+                Tile button = new Tile(pos,this);
             }
         }
+
+    }
+
+    public void update(Board board) {
+
+        this.repaint();
     }
 }
