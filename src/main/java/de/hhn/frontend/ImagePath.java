@@ -1,4 +1,4 @@
-package de.hhn;
+package de.hhn.frontend;
 
 
 public final class ImagePath {

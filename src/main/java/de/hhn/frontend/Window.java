@@ -1,4 +1,4 @@
-package de.hhn;
+package de.hhn.frontend;
 
 import javax.swing.*;
 import java.awt.*;

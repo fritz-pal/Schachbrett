@@ -1,11 +1,17 @@
 package de.hhn;
 
 public enum PieceType {
-    BISHOP,KNIGHT,KING,QUEEN,ROOK,PAWN, INVALID;
+    BISHOP,
+    KNIGHT,
+    KING,
+    QUEEN,
+    ROOK,
+    PAWN,
+    INVALID;
 
     public static PieceType fromString(String s){
         for(PieceType p : PieceType.values()){
-            if(p.toString().equals(s)){
+            if(p.toString().equalsIgnoreCase(s)){
                 return p;
             }
         }
