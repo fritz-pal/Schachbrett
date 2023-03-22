@@ -19,9 +19,9 @@ public class Window extends JFrame {
 
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
-                Tile tile = new Tile(x*100, y*100, 100, (x + y) % 2 == 0);
+                Tile tile = new Tile(x * 100, y * 100, 100, (x + y) % 2 == 0);
                 this.add(tile);
-                System.out.println(this.getWidth() + " " + this.getHeight());
+                System.out.printf("%d %d%n", this.getWidth(), this.getHeight());
             }
         }
     }
