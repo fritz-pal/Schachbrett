@@ -5,6 +5,8 @@ import de.hhn.schach.Vec2;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class Window extends JFrame {
         this.setTitle("Schach");
         this.setIconImage(new ImageIcon(ImagePath.getPath("icon.png")).getImage());
         this.getContentPane().setBackground(new Color(0x312e2b));
+        this.setResizable(true);
 
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
