@@ -14,13 +14,15 @@ public class Window extends JFrame {
     public Window() {
         super();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(816, 839);
+        this.setSize(800, 800);
+        this.getContentPane().setPreferredSize(new Dimension(800, 800));
+        this.pack();
         this.setLocationRelativeTo(null);
         this.setLayout(null);
+        this.setMinimumSize(new Dimension(416, 439));
         this.setTitle("Schach");
-        this.setResizable(false);
         this.setIconImage(new ImageIcon(ImagePath.getPath("icon.png")).getImage());
-        this.getContentPane().setBackground(new Color(0xedd6b0));
+        this.getContentPane().setBackground(new Color(0x312e2b));
 
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
@@ -37,6 +39,7 @@ public class Window extends JFrame {
         for (Tile tile : tiles) {
             tile.paint(g);
         }
+        System.out.println("Width: " + this.getContentPane().getWidth() + ", Height: " + this .getContentPane().getHeight());
     }
 
     public void update(Board board) {
