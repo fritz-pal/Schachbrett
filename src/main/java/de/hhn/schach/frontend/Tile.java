@@ -85,7 +85,7 @@ public class Tile extends JButton {
 
         imgGraphics.drawImage(this.hoverEffect().getImage(), 0, 0, null);
         if (piece != null) {
-            ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.getType(), piece.isWhite(), piece.isWhite()));
+            ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.getType(), piece.isWhite(), !piece.isWhite()));
             imgGraphics.drawImage(pieceImg.getImage(), 0, 0,100, 100, null);
         }
         return new ImageIcon(img);

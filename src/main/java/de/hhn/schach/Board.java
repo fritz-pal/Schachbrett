@@ -21,7 +21,7 @@ public class Board {
                 if (Character.isDigit(c)) {
                     j += Character.getNumericValue(c);
                 } else {
-                    pieces.put(new Vec2(i, j), new Piece(PieceType.fromNotation(Character.toUpperCase(c)), Character.isUpperCase(c)));
+                    pieces.put(new Vec2(7-i, j), new Piece(PieceType.fromNotation(Character.toUpperCase(c)), Character.isUpperCase(c)));
                     j++;
                 }
             }
