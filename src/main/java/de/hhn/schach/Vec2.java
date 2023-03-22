@@ -66,7 +66,7 @@ public class Vec2 {
 
     @Override
     public String toString() {
-        return this.getName().toUpperCase();
+        return this.getName();
     }
 
     @Override

@@ -18,7 +18,7 @@ public final class ImagePath {
 
         else result += "+";
 
-        result += ".svg";
+        result += ".png";
         return getPath(result);
     }
 }
