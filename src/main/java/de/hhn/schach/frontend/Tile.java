@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 
 public class Tile extends JButton {
@@ -48,7 +47,8 @@ public class Tile extends JButton {
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == 1 && hovering) {
                     mousePressed = true;
-                    System.out.println("Pressed " + pos);
+                    window.game.getState().onTileClick(pos);
+                    System.out.println("Clicked " + pos);
                 }
             }
 
@@ -78,7 +78,7 @@ public class Tile extends JButton {
         return new ImageIcon(img);
     }
 
-    private void calcPosition(){
+    private void calcPosition() {
         if (window.getContentPane().getHeight() > window.getContentPane().getWidth()) {
             translatedPos.x = pos.getY() * tileSize();
             translatedPos.y = (7 - pos.getX()) * tileSize() + ((window.getContentPane().getHeight() - window.getContentPane().getWidth()) / 2);

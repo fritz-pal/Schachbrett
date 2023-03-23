@@ -1,6 +1,7 @@
 package de.hhn.schach.frontend;
 
 import de.hhn.schach.Board;
+import de.hhn.schach.Game;
 import de.hhn.schach.Vec2;
 
 import javax.swing.*;
@@ -9,12 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Window extends JFrame {
+    public final Game game;
     private final boolean rotatedPieces;
     private final boolean rotatedBoard;
     List<Tile> tiles = new ArrayList<>();
 
-    public Window(boolean rotatedPieces, boolean rotatedBoard) {
+    public Window(Game game, boolean rotatedPieces, boolean rotatedBoard) {
         super();
+        this.game = game;
         this.rotatedBoard = rotatedBoard;
         this.rotatedPieces = rotatedPieces;
 
@@ -51,12 +54,8 @@ public class Window extends JFrame {
     public void update(Board board) {
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();
-            Vec2 newPos = new Vec2(7 - pos.getX(), 7 - pos.getY());
-            if (rotatedBoard) {
-                tile.setPiece(board.getPiece(newPos));
-            } else {
-                tile.setPiece(board.getPiece(pos));
-            }
+            tile.setPiece(board.getPiece(pos));
+
             System.out.println("Updated " + pos + " to " + board.getPiece(pos));
         }
         this.repaint();

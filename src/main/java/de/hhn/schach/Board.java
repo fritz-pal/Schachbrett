@@ -4,14 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Board {
-    Map<Vec2, Piece> pieces = new HashMap<>();
+    private final Map<Vec2, Piece> pieces = new HashMap<>();
+    private boolean whiteTurn;
 
     public Board() {
         this("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 
     public Board(String fen) {
-        if(!isValidFen(fen)) fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        if (!isValidFen(fen)) fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         String[] fenParts = fen.split(" ");
         String[] fenRows = fenParts[0].split("/");
         for (int i = 0; i < 8; i++) {
@@ -22,32 +23,35 @@ public class Board {
                 if (Character.isDigit(c)) {
                     j += Character.getNumericValue(c);
                 } else {
-                    pieces.put(new Vec2(7-i, j), new Piece(PieceType.fromNotation(Character.toUpperCase(c)), Character.isUpperCase(c)));
+                    pieces.put(new Vec2(7 - i, j), new Piece(PieceType.fromNotation(Character.toUpperCase(c)), Character.isUpperCase(c)));
                     j++;
                 }
             }
         }
+        whiteTurn = fenParts[1] == null || fenParts[1].equals("w");
     }
 
-    public static boolean isValidFen(String fen){
-        if(fen == null || fen.isEmpty()) return false;
+    public static boolean isValidFen(String fen) {
+        if (fen == null || fen.isEmpty()) return false;
         String[] fenParts = fen.split(" ");
         String[] fenRows = fenParts[0].split("/");
-        if(fenRows.length != 8) return false;
+        if (fenRows.length != 8) return false;
         for (int i = 0; i < 8; i++) {
             int number = 0;
             String fenRow = fenRows[i];
-            for(int j = 0; j < fenRow.length(); j++){
+            for (int j = 0; j < fenRow.length(); j++) {
                 char c = fenRow.charAt(j);
-                if(Character.isDigit(c)){
+                if (Character.isDigit(c)) {
                     number += Character.getNumericValue(c);
-                }else{
+                } else {
                     number++;
                 }
             }
-            if(number != 8) return false;
+            if (number != 8) return false;
         }
-           return true;
+        if (fenParts[1] != null && !fenParts[1].equals("w") && !fenParts[1].equals("b")) return false;
+
+        return true;
     }
 
     public String getFen() {
@@ -73,6 +77,8 @@ public class Board {
                 fen.append("/");
             }
         }
+        fen.append(" ");
+        fen.append(whiteTurn ? "w" : "b");
         return fen.toString();
     }
 
@@ -102,5 +108,17 @@ public class Board {
     public String movePiece(Vec2 from, Vec2 to) {
         //TODO
         return null;
+    }
+
+    public boolean isWhiteTurn() {
+        return whiteTurn;
+    }
+
+    public void setTurn(boolean whiteTurn) {
+        this.whiteTurn = whiteTurn;
+    }
+
+    public boolean occupied(Vec2 pos) {
+        return pieces.containsKey(pos);
     }
 }
