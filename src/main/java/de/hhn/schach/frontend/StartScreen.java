@@ -1,5 +1,6 @@
 package de.hhn.schach.frontend;
 
+import de.hhn.schach.Board;
 import de.hhn.schach.Game;
 
 import javax.swing.*;
@@ -30,7 +31,13 @@ public class StartScreen extends JFrame {
         JCheckBox rotatedPieces = makeCheckbox("Rotated pieces");
         JCheckBox rotatedBoard = makeCheckbox("Rotated board");
 
-        JTextField fenInput = new JTextField("Custom Position (Fen)");
+        JTextField fenInput = new JTextField("");
+        fenInput.setToolTipText("Custom Position (Fen)");
+        fenInput.setBounds(50, 475, 400, 25);
+        fenInput.setBackground(new Color(0x514e4b));
+        fenInput.setForeground(Color.WHITE);
+        fenInput.setFont(new Font("Arial", Font.PLAIN, 14));
+        this.getContentPane().add(fenInput, 0);
 
         JButton startButton = new JButton("Start Game");
         startButton.setBounds(250, 525, 200, 50);
@@ -38,7 +45,12 @@ public class StartScreen extends JFrame {
         startButton.setForeground(Color.WHITE);
         startButton.setBackground(new Color(0x514e4b));
         startButton.setFocusable(false);
-        startButton.addActionListener(e -> new Game(rotatedPieces.isSelected(), rotatedBoard.isSelected(), fenInput.getText()));
+        startButton.addActionListener(e -> {
+            boolean validFen = Board.isValidFen(fenInput.getText());
+            if(validFen || fenInput.getText().equals("")) {
+                new Game(rotatedPieces.isSelected(), rotatedBoard.isSelected(), fenInput.getText());
+            }
+        });
         this.getContentPane().add(startButton, 0);
 
         this.setVisible(true);
@@ -51,7 +63,7 @@ public class StartScreen extends JFrame {
         checkbox.setForeground(Color.WHITE);
         checkbox.setFocusable(false);
         checkbox.setBackground(new Color(0x312e2b));
-        this.getContentPane().add(checkbox);
+        this.getContentPane().add(checkbox, 0);
         checkboxNum++;
         return checkbox;
     }

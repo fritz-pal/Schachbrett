@@ -11,6 +11,7 @@ public class Board {
     }
 
     public Board(String fen) {
+        if(!isValidFen(fen)) fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         String[] fenParts = fen.split(" ");
         String[] fenRows = fenParts[0].split("/");
         for (int i = 0; i < 8; i++) {
@@ -29,9 +30,8 @@ public class Board {
     }
 
     public static boolean isValidFen(String fen){
-        if(fen.isEmpty()) return false;
+        if(fen == null || fen.isEmpty()) return false;
         String[] fenParts = fen.split(" ");
-        if(fenParts.length < 1) return false;
         String[] fenRows = fenParts[0].split("/");
         if(fenRows.length != 8) return false;
         for (int i = 0; i < 8; i++) {

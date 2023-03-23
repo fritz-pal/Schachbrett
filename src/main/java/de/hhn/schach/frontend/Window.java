@@ -51,7 +51,7 @@ public class Window extends JFrame {
     public void update(Board board) {
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();
-            Vec2 newPos = new Vec2(pos.getX(), 7 - pos.getY());
+            Vec2 newPos = new Vec2(7 - pos.getX(), 7 - pos.getY());
             if (rotatedBoard) {
                 tile.setPiece(board.getPiece(newPos));
             } else {
@@ -64,5 +64,9 @@ public class Window extends JFrame {
 
     public boolean isRotatedPieces() {
         return rotatedPieces;
+    }
+
+    public boolean isRotatedBoard() {
+        return rotatedBoard;
     }
 }

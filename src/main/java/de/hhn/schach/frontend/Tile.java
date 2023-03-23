@@ -105,7 +105,8 @@ public class Tile extends JButton {
 
         imgGraphics.drawImage(this.hoverEffect().getImage(), 0, 0, null);
         if (piece != null) {
-            ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.getType(), piece.isWhite(), !piece.isWhite() && window.isRotatedPieces()));
+            boolean rotated = !piece.isWhite() && window.isRotatedPieces() && !window.isRotatedBoard() || piece.isWhite() && window.isRotatedPieces() && window.isRotatedBoard();
+            ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.getType(), piece.isWhite(), rotated));
             imgGraphics.drawImage(pieceImg.getImage(), 0, 0, tileSize(), tileSize(), null);
         }
         return new ImageIcon(img);
