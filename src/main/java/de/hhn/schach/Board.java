@@ -28,6 +28,28 @@ public class Board {
         }
     }
 
+    public static boolean isValidFen(String fen){
+        if(fen.isEmpty()) return false;
+        String[] fenParts = fen.split(" ");
+        if(fenParts.length < 1) return false;
+        String[] fenRows = fenParts[0].split("/");
+        if(fenRows.length != 8) return false;
+        for (int i = 0; i < 8; i++) {
+            int number = 0;
+            String fenRow = fenRows[i];
+            for(int j = 0; j < fenRow.length(); j++){
+                char c = fenRow.charAt(j);
+                if(Character.isDigit(c)){
+                    number += Character.getNumericValue(c);
+                }else{
+                    number++;
+                }
+            }
+            if(number != 8) return false;
+        }
+           return true;
+    }
+
     public String getFen() {
         StringBuilder fen = new StringBuilder();
         for (int i = 0; i < 8; i++) {

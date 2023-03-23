@@ -5,17 +5,20 @@ import de.hhn.schach.Vec2;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Window extends JFrame {
+    private final boolean rotatedPieces;
+    private final boolean rotatedBoard;
     List<Tile> tiles = new ArrayList<>();
 
-    public Window() {
+    public Window(boolean rotatedPieces, boolean rotatedBoard) {
         super();
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.rotatedBoard = rotatedBoard;
+        this.rotatedPieces = rotatedPieces;
+
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setSize(800, 800);
         this.getContentPane().setPreferredSize(new Dimension(800, 800));
         this.pack();
@@ -42,15 +45,24 @@ public class Window extends JFrame {
         for (Tile tile : tiles) {
             tile.paint(g);
         }
-        System.out.println("Width: " + this.getContentPane().getWidth() + ", Height: " + this .getContentPane().getHeight());
+        System.out.println("Width: " + this.getContentPane().getWidth() + ", Height: " + this.getContentPane().getHeight());
     }
 
     public void update(Board board) {
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();
-            tile.setPiece(board.getPiece(pos));
+            Vec2 newPos = new Vec2(pos.getX(), 7 - pos.getY());
+            if (rotatedBoard) {
+                tile.setPiece(board.getPiece(newPos));
+            } else {
+                tile.setPiece(board.getPiece(pos));
+            }
             System.out.println("Updated " + pos + " to " + board.getPiece(pos));
         }
         this.repaint();
+    }
+
+    public boolean isRotatedPieces() {
+        return rotatedPieces;
     }
 }

@@ -14,12 +14,11 @@ import java.awt.image.BufferedImage;
 public class Tile extends JButton {
     private final Vec2 pos;
     private final boolean isWhite;
-    private Point translatedPos;
+    private final Point translatedPos;
     Window window;
     private Piece piece = null;
     private boolean mousePressed = false;
     private boolean hovering = false;
-    private Point previousPoint = new Point(0, 0);
 
     public Tile(Vec2 pos, Window window) {
         this.window = window;
@@ -30,12 +29,6 @@ public class Tile extends JButton {
         this.setContentAreaFilled(false);
         this.setBorderPainted(false);
         this.addMouseListener(mouseListener());
-        this.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                translatedPos.translate((int) (e.getPoint().getX() - previousPoint.getX()), (int) (e.getPoint().getY() - previousPoint.getY()));
-            }
-        });
         window.add(this);
     }
 
@@ -55,7 +48,7 @@ public class Tile extends JButton {
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == 1 && hovering) {
                     mousePressed = true;
-                    previousPoint = e.getPoint();
+                    System.out.println("Pressed " + pos);
                 }
             }
 
@@ -63,7 +56,6 @@ public class Tile extends JButton {
             public void mouseReleased(MouseEvent e) {
                 if (e.getButton() == 1 && mousePressed) {
                     mousePressed = false;
-                    calcPosition();
                 }
             }
         };
@@ -113,7 +105,7 @@ public class Tile extends JButton {
 
         imgGraphics.drawImage(this.hoverEffect().getImage(), 0, 0, null);
         if (piece != null) {
-            ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.getType(), piece.isWhite(), !piece.isWhite()));
+            ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.getType(), piece.isWhite(), !piece.isWhite() && window.isRotatedPieces()));
             imgGraphics.drawImage(pieceImg.getImage(), 0, 0, tileSize(), tileSize(), null);
         }
         return new ImageIcon(img);
