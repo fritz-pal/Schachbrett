@@ -42,21 +42,11 @@ public class Window extends JFrame {
         }
     }
 
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        for (Tile tile : tiles) {
-            tile.paint(g);
-        }
-        System.out.println("Width: " + this.getContentPane().getWidth() + ", Height: " + this.getContentPane().getHeight());
-    }
-
     public void update(Board board) {
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();
             tile.setPiece(board.getPiece(pos));
-
-            System.out.println("Updated " + pos + " to " + board.getPiece(pos));
+            tile.setSelected(pos.equals(game.getSelectedTile()));
         }
         this.repaint();
     }

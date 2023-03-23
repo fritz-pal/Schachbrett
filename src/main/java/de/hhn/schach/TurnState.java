@@ -15,7 +15,8 @@ public class TurnState implements State {
         Board board = game.getMainBoard();
         if (board.occupied(pos)) {
             if (board.getPiece(pos).isWhite() == whiteTurn) {
-                game.changeState(new PieceSelectedState(whiteTurn, pos));
+                game.setSelectedTile(pos);
+                game.changeState(new PieceSelectedState(game));
             }
         }
     }
