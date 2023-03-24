@@ -29,7 +29,7 @@ public class Window extends JFrame {
         this.setLayout(null);
         this.setMinimumSize(new Dimension(416, 439));
         this.setTitle("Schach");
-        this.setIconImage(new ImageIcon(ImagePath.getPath("icon.png")).getImage());
+        this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
         this.getContentPane().setBackground(new Color(0x312e2b));
         this.setResizable(true);
 

@@ -20,7 +20,7 @@ public class StartScreen extends JFrame {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
-        this.setIconImage(new ImageIcon(ImagePath.getPath("icon.png")).getImage());
+        this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
 
         JLabel titleLabel = new JLabel("Schach");
         titleLabel.setBounds(200, 10, 100, 50);
@@ -71,6 +71,6 @@ public class StartScreen extends JFrame {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        g.drawImage(new ImageIcon(ImagePath.getPath("thumbnail.png")).getImage(), 100, 100, 300, 225, null);
+        g.drawImage(new ImageIcon(ImagePath.getResource("thumbnail.png")).getImage(), 100, 100, 300, 225, null);
     }
 }

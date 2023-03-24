@@ -3,12 +3,22 @@ package de.hhn.schach.frontend;
 
 import de.hhn.schach.PieceType;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.File;
+
 public final class ImagePath {
-    public static String getPath(String file) {
-        return "src/main/resources/" + file;
+    public static Image getResource(String file) {
+        Image image = null;
+        try {
+            image = ImageIO.read(ImagePath.class.getResource("/" + file));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return image;
     }
 
-    public static String getPieceImage(PieceType type, boolean isWhite, boolean rotated) {
+    public static Image getPieceImage(PieceType type, boolean isWhite, boolean rotated) {
         String result = type.toString().toLowerCase();
         if (isWhite) result += "_white";
 
@@ -19,6 +29,6 @@ public final class ImagePath {
         else result += "+";
 
         result += ".png";
-        return getPath(result);
+        return getResource(result);
     }
 }
