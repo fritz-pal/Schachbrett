@@ -1,13 +1,10 @@
 package de.hhn.schach;
 
 public class PieceSelectedState implements State {
-    private boolean whiteTurn;
-    private Vec2 selectedTile;
+
     private Game game;
 
     public PieceSelectedState(Game game) {
-        this.whiteTurn = game.getMainBoard().isWhiteTurn();
-        this.selectedTile = game.getSelectedTile();
         this.game = game;
     }
 
@@ -17,11 +14,18 @@ public class PieceSelectedState implements State {
         if (game.getSelectedTile() != null && game.getSelectedTile().equals(pos)) {
             game.setSelectedTile(null);
             game.changeState(new TurnState(game));
-        } else {
-            if (board.occupied(pos) && board.getPiece(pos).isWhite() == whiteTurn) {
-                game.setSelectedTile(pos);
-                game.update();
-            }
+            return;
+        }
+        if (board.occupied(pos) && board.getPiece(pos).isWhite() == board.isWhiteTurn()) {
+            game.setSelectedTile(pos);
+            game.update();
+            return;
+        }
+        if (!board.occupied(pos) || board.getPiece(pos).isWhite() != board.isWhiteTurn()) {
+            board.move(game.getSelectedTile(), pos);
+            game.setSelectedTile(null);
+            board.setTurn(!board.isWhiteTurn());
+            game.changeState(new TurnState(game));
         }
     }
 }

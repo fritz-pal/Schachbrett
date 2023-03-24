@@ -105,11 +105,6 @@ public class Board {
         pieces.put(pos, piece);
     }
 
-    public String movePiece(Vec2 from, Vec2 to) {
-        //TODO
-        return null;
-    }
-
     public boolean isWhiteTurn() {
         return whiteTurn;
     }
@@ -120,5 +115,9 @@ public class Board {
 
     public boolean occupied(Vec2 pos) {
         return pieces.containsKey(pos);
+    }
+
+    public void move(Vec2 from, Vec2 to) {
+        pieces.put(to, pieces.remove(from));
     }
 }
