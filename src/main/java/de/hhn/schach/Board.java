@@ -1,6 +1,8 @@
 package de.hhn.schach;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Board {
@@ -105,6 +107,65 @@ public class Board {
         pieces.put(pos, piece);
     }
 
+    public boolean isLegalMove(Vec2 from, Vec2 to) {
+        return false;
+        //TODO
+    }
+
+    public List<Vec2> getAllLegalMoves(Vec2 pos) {
+        List<Vec2> moves = new ArrayList<>();
+        if (!occupied(pos)) return moves;
+        Piece piece = getPiece(pos);
+        switch (piece.getType()) {
+            case KING -> {
+                moves.addAll(getKingMoves(pos));
+            }
+            case QUEEN -> {
+                moves.addAll(getRookMoves(pos));
+                moves.addAll(getBishopMoves(pos));
+
+            }
+            case ROOK -> {
+                moves.addAll(getRookMoves(pos));
+            }
+            case BISHOP -> {
+                moves.addAll(getBishopMoves(pos));
+            }
+            case KNIGHT -> {
+                moves.addAll(getKnightMoves(pos));
+            }
+            case PAWN -> {
+                moves.addAll(getPawnMoves(pos));
+            }
+        }
+        return moves;
+    }
+
+    private List<Vec2> getKingMoves(Vec2 pos) {
+        List<Vec2> moves = new ArrayList<>();
+        return moves;
+    }
+
+    private List<Vec2> getRookMoves(Vec2 pos) {
+        List<Vec2> moves = new ArrayList<>();
+        return moves;
+    }
+
+    private List<Vec2> getBishopMoves(Vec2 pos) {
+        List<Vec2> moves = new ArrayList<>();
+        return moves;
+    }
+
+    private List<Vec2> getKnightMoves(Vec2 pos) {
+        List<Vec2> moves = new ArrayList<>();
+        return moves;
+    }
+
+    private List<Vec2> getPawnMoves(Vec2 pos) {
+        List<Vec2> moves = new ArrayList<>();
+        return moves;
+    }
+
     public boolean isWhiteTurn() {
         return whiteTurn;
     }
@@ -118,6 +179,9 @@ public class Board {
     }
 
     public void move(Vec2 from, Vec2 to) {
-        pieces.put(to, pieces.remove(from));
+        Piece piece = pieces.remove(from);
+        if (piece.getType().equals(PieceType.PAWN) && ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())))
+            piece = new Piece(PieceType.QUEEN, piece.isWhite());
+        pieces.put(to, piece);
     }
 }

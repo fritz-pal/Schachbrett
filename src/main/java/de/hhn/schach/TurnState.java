@@ -2,7 +2,7 @@ package de.hhn.schach;
 
 public class TurnState implements State {
 
-    private Game game;
+    private final Game game;
 
     public TurnState(Game game) {
         this.game = game;

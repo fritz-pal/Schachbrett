@@ -2,7 +2,7 @@ package de.hhn.schach;
 
 public class PieceSelectedState implements State {
 
-    private Game game;
+    private final Game game;
 
     public PieceSelectedState(Game game) {
         this.game = game;
