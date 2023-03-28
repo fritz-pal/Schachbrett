@@ -5,13 +5,15 @@ import de.hhn.schach.PieceType;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.File;
+import java.net.URL;
 
 public final class ImagePath {
     public static Image getResource(String file) {
         Image image = null;
         try {
-            image = ImageIO.read(ImagePath.class.getResource("/" + file));
+            URL resource = ImagePath.class.getResource("/" + file);
+            if(resource == null) throw new Exception("Resource not found: " + file);
+            image = ImageIO.read(resource);
         } catch (Exception e) {
             e.printStackTrace();
         }

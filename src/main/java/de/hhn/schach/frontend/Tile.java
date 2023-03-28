@@ -19,6 +19,7 @@ public class Tile extends JButton {
     private boolean mousePressed = false;
     private boolean hovering = false;
     private boolean selected = false;
+    private boolean legalMoveIcon = false;
 
     public Tile(Vec2 pos, Window window) {
         this.window = window;
@@ -66,15 +67,27 @@ public class Tile extends JButton {
         return Math.min(window.getContentPane().getHeight(), window.getContentPane().getWidth()) / 8;
     }
 
-    private ImageIcon hoverEffect() {
+    private ImageIcon emptyTileImage() {
         BufferedImage img = new BufferedImage(tileSize(), tileSize(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D imgGraphics = img.createGraphics();
-        if (this.mousePressed || this.selected){
+        if (this.mousePressed || this.selected) {
             imgGraphics.setColor(isWhite ? new Color(0xf7eb58) : new Color(0xdcc431));
             imgGraphics.fillRect(0, 0, tileSize(), tileSize());
         } else if (this.hovering) {
             imgGraphics.setColor(new Color(0xf7, 0xeb, 0x58, 60));
             imgGraphics.fillRect(0, 0, tileSize(), tileSize());
+        }
+        if (this.legalMoveIcon) {
+            imgGraphics.setColor(new Color(0, 0, 0, 60));
+            if (this.piece == null) {
+                imgGraphics.fillOval(tileSize() / 4, tileSize() / 4, tileSize() / 2, tileSize() / 2);
+            } else {
+                int borderSize = tileSize() / 8;
+                imgGraphics.fillRect(borderSize, 0, tileSize(), borderSize);
+                imgGraphics.fillRect(0, 0, borderSize, tileSize()-borderSize);
+                imgGraphics.fillRect(tileSize() - borderSize, borderSize, borderSize, tileSize());
+                imgGraphics.fillRect(0, tileSize() - borderSize, tileSize()-borderSize, borderSize);
+            }
         }
         return new ImageIcon(img);
     }
@@ -104,7 +117,7 @@ public class Tile extends JButton {
         imgGraphics.setColor(isWhite ? new Color(0xedd6b0) : new Color(0xb88762));
         imgGraphics.fillRect(0, 0, tileSize(), tileSize());
 
-        imgGraphics.drawImage(this.hoverEffect().getImage(), 0, 0, null);
+        imgGraphics.drawImage(this.emptyTileImage().getImage(), 0, 0, null);
         if (piece != null) {
             boolean rotated = !piece.isWhite() && window.isRotatedPieces() && !window.isRotatedBoard() || piece.isWhite() && window.isRotatedPieces() && window.isRotatedBoard();
             ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.getType(), piece.isWhite(), rotated));
