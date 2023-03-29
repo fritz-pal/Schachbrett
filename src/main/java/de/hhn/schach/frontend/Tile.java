@@ -84,9 +84,9 @@ public class Tile extends JButton {
             } else {
                 int borderSize = tileSize() / 8;
                 imgGraphics.fillRect(borderSize, 0, tileSize(), borderSize);
-                imgGraphics.fillRect(0, 0, borderSize, tileSize()-borderSize);
+                imgGraphics.fillRect(0, 0, borderSize, tileSize() - borderSize);
                 imgGraphics.fillRect(tileSize() - borderSize, borderSize, borderSize, tileSize());
-                imgGraphics.fillRect(0, tileSize() - borderSize, tileSize()-borderSize, borderSize);
+                imgGraphics.fillRect(0, tileSize() - borderSize, tileSize() - borderSize, borderSize);
             }
         }
         return new ImageIcon(img);
@@ -120,7 +120,7 @@ public class Tile extends JButton {
         imgGraphics.drawImage(this.emptyTileImage().getImage(), 0, 0, null);
         if (piece != null) {
             boolean rotated = !piece.isWhite() && window.isRotatedPieces() && !window.isRotatedBoard() || piece.isWhite() && window.isRotatedPieces() && window.isRotatedBoard();
-            ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.getType(), piece.isWhite(), rotated));
+            ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.type(), piece.isWhite(), rotated));
             imgGraphics.drawImage(pieceImg.getImage(), 0, 0, tileSize(), tileSize(), null);
         }
         return new ImageIcon(img);
@@ -136,5 +136,9 @@ public class Tile extends JButton {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public void setLegalMove(boolean legalMoveIcon) {
+        this.legalMoveIcon = legalMoveIcon;
     }
 }

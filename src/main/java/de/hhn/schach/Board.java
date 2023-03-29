@@ -69,7 +69,7 @@ public class Board {
                         fen.append(empty);
                         empty = 0;
                     }
-                    fen.append(piece.isWhite() ? piece.getType().getNotation() : Character.toLowerCase(piece.getType().getNotation()));
+                    fen.append(piece.isWhite() ? piece.type().getNotation() : Character.toLowerCase(piece.type().getNotation()));
                 }
             }
             if (empty > 0) {
@@ -91,7 +91,7 @@ public class Board {
             boardString.append("[");
             for (int j = 0; j < 8; j++) {
                 Piece piece = pieces.get(new Vec2(i, j));
-                boardString.append(piece == null ? " " : piece.isWhite() ? piece.getType().getNotation() : Character.toLowerCase(piece.getType().getNotation()));
+                boardString.append(piece == null ? " " : piece.isWhite() ? piece.type().getNotation() : Character.toLowerCase(piece.type().getNotation()));
                 if (j != 7) boardString.append(", ");
             }
             boardString.append("]\n");
@@ -116,7 +116,7 @@ public class Board {
         List<Vec2> moves = new ArrayList<>();
         if (!occupied(pos)) return moves;
         Piece piece = getPiece(pos);
-        switch (piece.getType()) {
+        switch (piece.type()) {
             case KING -> {
                 moves.addAll(getKingMoves(pos));
             }
@@ -143,26 +143,174 @@ public class Board {
 
     private List<Vec2> getKingMoves(Vec2 pos) {
         List<Vec2> moves = new ArrayList<>();
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                moves.addAll(inBoundsAndNotOccupied(pos, pos.getX() + i, pos.getY() + j));
+            }
+        }
         return moves;
     }
 
     private List<Vec2> getRookMoves(Vec2 pos) {
         List<Vec2> moves = new ArrayList<>();
+        int i = pos.getX() + 1;
+        while (i < 8) {
+            Vec2 move = new Vec2(i, pos.getY());
+            if (occupied(move)) {
+                if (getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+                    moves.add(move);
+                }
+                break;
+            } else moves.add(move);
+            i++;
+        }
+        i = pos.getX() - 1;
+        while (i >= 0) {
+            Vec2 move = new Vec2(i, pos.getY());
+            if (occupied(move)) {
+                if (getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+                    moves.add(move);
+                }
+                break;
+            } else moves.add(move);
+            i--;
+        }
+        i = pos.getY() + 1;
+        while (i < 8) {
+            Vec2 move = new Vec2(pos.getX(), i);
+            if (occupied(move)) {
+                if (getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+                    moves.add(move);
+                }
+                break;
+            } else moves.add(move);
+            i++;
+        }
+        i = pos.getY() - 1;
+        while (i >= 0) {
+            Vec2 move = new Vec2(pos.getX(), i);
+            if (occupied(move)) {
+                if (getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+                    moves.add(move);
+                }
+                break;
+            } else moves.add(move);
+            i--;
+        }
         return moves;
     }
 
     private List<Vec2> getBishopMoves(Vec2 pos) {
         List<Vec2> moves = new ArrayList<>();
+        int i = pos.getX() + 1;
+        int j = pos.getY() + 1;
+        while (i < 8 && j < 8) {
+            Vec2 move = new Vec2(i, j);
+            if (occupied(move)) {
+                if (getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+                    moves.add(move);
+                }
+                break;
+            } else moves.add(move);
+            i++;
+            j++;
+        }
+        i = pos.getX() + 1;
+        j = pos.getY() - 1;
+        while (i < 8 && j >= 0) {
+            Vec2 move = new Vec2(i, j);
+            if (occupied(move)) {
+                if (getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+                    moves.add(move);
+                }
+                break;
+            } else moves.add(move);
+            i++;
+            j--;
+        }
+        i = pos.getX() - 1;
+        j = pos.getY() - 1;
+        while (i >= 0 && j >= 0) {
+            Vec2 move = new Vec2(i, j);
+            if (occupied(move)) {
+                if (getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+                    moves.add(move);
+                }
+                break;
+            } else moves.add(move);
+            i--;
+            j--;
+        }
+
+        i = pos.getX() - 1;
+        j = pos.getY() + 1;
+        while (i >= 0 && j < 8) {
+            Vec2 move = new Vec2(i, j);
+            if (occupied(move)) {
+                if (getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+                    moves.add(move);
+                }
+                break;
+            } else moves.add(move);
+            i--;
+            j++;
+        }
         return moves;
     }
 
     private List<Vec2> getKnightMoves(Vec2 pos) {
         List<Vec2> moves = new ArrayList<>();
+        moves.addAll(inBoundsAndNotOccupied(pos, pos.getX() + 2, pos.getY() + 1));
+        moves.addAll(inBoundsAndNotOccupied(pos, pos.getX() + 2, pos.getY() - 1));
+        moves.addAll(inBoundsAndNotOccupied(pos, pos.getX() - 2, pos.getY() + 1));
+        moves.addAll(inBoundsAndNotOccupied(pos, pos.getX() - 2, pos.getY() - 1));
+        moves.addAll(inBoundsAndNotOccupied(pos, pos.getX() + 1, pos.getY() + 2));
+        moves.addAll(inBoundsAndNotOccupied(pos, pos.getX() + 1, pos.getY() - 2));
+        moves.addAll(inBoundsAndNotOccupied(pos, pos.getX() - 1, pos.getY() + 2));
+        moves.addAll(inBoundsAndNotOccupied(pos, pos.getX() - 1, pos.getY() - 2));
         return moves;
     }
 
+
+
     private List<Vec2> getPawnMoves(Vec2 pos) {
         List<Vec2> moves = new ArrayList<>();
+        Vec2 move = new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 1 : -1), pos.getY());
+        if (!occupied(move)) {
+            moves.add(move);
+        }
+        if ((pos.getX() == 1 && getPiece(pos).isWhite()) || (pos.getX() == 6 && !getPiece(pos).isWhite())) {
+            move = new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 2 : -2), pos.getY());
+            if (!occupied(move)) {
+                moves.add(move);
+            }
+        }
+        if (pos.getY() - 1 >= 0) {
+            move = new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 1 : -1), pos.getY() - 1);
+            if (occupied(move) && getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+                moves.add(move);
+            }
+        }
+
+        if (pos.getY() + 1 < 8) {
+            move = new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 1 : -1), pos.getY() + 1);
+            if (occupied(move) && getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+                moves.add(move);
+            }
+        }
+
+
+        return moves;
+    }
+
+    private List<Vec2> inBoundsAndNotOccupied(Vec2 pos, int x, int y){
+        List<Vec2> moves = new ArrayList<>();
+        if (Vec2.isInBounds(x, y)) {
+            Vec2 move = new Vec2(x, y);
+            if (!(occupied(move) && getPiece(move).isWhite() == getPiece(pos).isWhite())) {
+                moves.add(move);
+            }
+        }
         return moves;
     }
 
@@ -180,7 +328,7 @@ public class Board {
 
     public void move(Vec2 from, Vec2 to) {
         Piece piece = pieces.remove(from);
-        if (piece.getType().equals(PieceType.PAWN) && ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())))
+        if (piece.type().equals(PieceType.PAWN) && ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())))
             piece = new Piece(PieceType.QUEEN, piece.isWhite());
         pieces.put(to, piece);
     }
