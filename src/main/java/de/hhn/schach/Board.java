@@ -271,8 +271,6 @@ public class Board {
         return moves;
     }
 
-
-
     private List<Vec2> getPawnMoves(Vec2 pos) {
         List<Vec2> moves = new ArrayList<>();
         Vec2 move = new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 1 : -1), pos.getY());
