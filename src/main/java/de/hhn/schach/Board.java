@@ -7,8 +7,11 @@ import java.util.Map;
 
 public class Board implements Cloneable {
     private final Map<Vec2, Piece> pieces = new HashMap<>();
-
-    private Vec2 enPassantTarget = null;
+    private Vec2 enPassant = null;
+    private boolean whiteCastleQ = true;
+    private boolean whiteCastleK = true;
+    private boolean blackCastleQ = true;
+    private boolean blackCastleK = true;
     private boolean whiteTurn;
 
     public Board() {
@@ -33,16 +36,38 @@ public class Board implements Cloneable {
             }
         }
         whiteTurn = fenParts[1] == null || fenParts[1].equals("w");
+        if (fenParts[2] == null) {
+            whiteCastleQ = true;
+            whiteCastleK = true;
+            blackCastleQ = true;
+            blackCastleK = true;
+        } else {
+            whiteCastleQ = fenParts[2].contains("Q");
+            whiteCastleK = fenParts[2].contains("K");
+            blackCastleQ = fenParts[2].contains("q");
+            blackCastleK = fenParts[2].contains("k");
+        }
+        if (fenParts[3] == null || fenParts[3].equals("-")) {
+            enPassant = null;
+        } else {
+            enPassant = new Vec2(fenParts[3]);
+        }
     }
 
-    public Board(Map<Vec2, Piece> pieces, boolean whiteTurn) {
+    public Board(Map<Vec2, Piece> pieces, boolean whiteTurn, Vec2 enPassant, boolean whiteCastleQ, boolean whiteCastleK, boolean blackCastleQ, boolean blackCastleK) {
         this.pieces.putAll(pieces);
         this.whiteTurn = whiteTurn;
+        this.enPassant = enPassant;
+        this.whiteCastleQ = whiteCastleQ;
+        this.whiteCastleK = whiteCastleK;
+        this.blackCastleQ = blackCastleQ;
+        this.blackCastleK = blackCastleK;
     }
 
     public static boolean isValidFen(String fen) {
         if (fen == null || fen.isEmpty()) return false;
         String[] fenParts = fen.split(" ");
+
         String[] fenRows = fenParts[0].split("/");
         if (fenRows.length != 8) return false;
         for (int i = 0; i < 8; i++) {
@@ -59,7 +84,8 @@ public class Board implements Cloneable {
             if (number != 8) return false;
         }
         if (fenParts[1] != null && !fenParts[1].equals("w") && !fenParts[1].equals("b")) return false;
-
+        if (fenParts[2] != null && !fenParts[2].matches("[KQkq-]{1,4}")) return false;
+        if (fenParts[3] != null && !fenParts[3].matches("[a-h][1-8]|-")) return false;
         return true;
     }
 
@@ -309,20 +335,20 @@ public class Board implements Cloneable {
         }
         if ((pos.getX() == 1 && getPiece(pos).isWhite()) || (pos.getX() == 6 && !getPiece(pos).isWhite())) {
             move = new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 2 : -2), pos.getY());
-            if (!occupied(move)) {
+            if (!occupied(move) && !occupied(new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 1 : -1), pos.getY()))) {
                 moves.add(move);
             }
         }
         if (pos.getY() - 1 >= 0) {
             move = new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 1 : -1), pos.getY() - 1);
-            if (occupied(move) && getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+            if ((occupied(move) && getPiece(move).isWhite() != getPiece(pos).isWhite()) || (enPassant != null && enPassant.equals(move))) {
                 moves.add(move);
             }
         }
 
         if (pos.getY() + 1 < 8) {
             move = new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 1 : -1), pos.getY() + 1);
-            if (occupied(move) && getPiece(move).isWhite() != getPiece(pos).isWhite()) {
+            if ((occupied(move) && getPiece(move).isWhite() != getPiece(pos).isWhite()) || (enPassant != null && enPassant.equals(move))) {
                 moves.add(move);
             }
         }
@@ -357,6 +383,15 @@ public class Board implements Cloneable {
             if ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())) {
                 piece = new Piece(PieceType.QUEEN, piece.isWhite());
             }
+            if (to.equals(enPassant)) pieces.remove(new Vec2(to.getX() + (piece.isWhite() ? -1 : 1), to.getY()));
+
+            if (from.getX() == 1 && to.getX() == 3) {
+                enPassant = new Vec2(2, to.getY());
+            } else if (from.getX() == 6 && to.getX() == 4) {
+                enPassant = new Vec2(5, to.getY());
+            } else {
+                enPassant = null;
+            }
         }
         pieces.put(to, piece);
     }
@@ -372,6 +407,6 @@ public class Board implements Cloneable {
 
     @Override
     protected Board clone() {
-        return new Board(this.pieces, whiteTurn);
+        return new Board(this.pieces, whiteTurn, enPassant, whiteCastleQ, whiteCastleK, blackCastleQ, blackCastleK);
     }
 }
