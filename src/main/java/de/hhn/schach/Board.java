@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class Board implements Cloneable {
     private final Map<Vec2, Piece> pieces = new HashMap<>();
+
+    private Vec2 enPassantTarget = null;
     private boolean whiteTurn;
 
     public Board() {
@@ -117,8 +119,7 @@ public class Board implements Cloneable {
     }
 
     public boolean isLegalMove(Vec2 from, Vec2 to) {
-        return false;
-        //TODO
+        return getAllLegalMoves(from).contains(to);
     }
 
     public List<Vec2> getAllLegalMoves(Vec2 pos) {
@@ -165,10 +166,14 @@ public class Board implements Cloneable {
     public boolean ableToTakeKing(Vec2 from, Vec2 to) {
         Board tempBoard = this.clone();
         tempBoard.move(from, to);
-        Vec2 kingPos = tempBoard.getKingPos(!tempBoard.isWhiteTurn());
-        for(Vec2 pos : tempBoard.getPieces().keySet()) {
-            if(tempBoard.getPiece(pos).isWhite() == tempBoard.isWhiteTurn()) {
-                if(tempBoard.getAllPseudoLegalMoves(pos).contains(kingPos)) {
+        return tempBoard.isInCheck(!tempBoard.isWhiteTurn());
+    }
+
+    public boolean isInCheck(boolean white) {
+        Vec2 kingPos = getKingPos(white);
+        for (Vec2 pos : pieces.keySet()) {
+            if (pieces.get(pos).isWhite() != white) {
+                if (getAllPseudoLegalMoves(pos).contains(kingPos)) {
                     return true;
                 }
             }
@@ -348,8 +353,11 @@ public class Board implements Cloneable {
     public void move(Vec2 from, Vec2 to) {
         whiteTurn = !whiteTurn;
         Piece piece = pieces.remove(from);
-        if (piece.type().equals(PieceType.PAWN) && ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())))
-            piece = new Piece(PieceType.QUEEN, piece.isWhite());
+        if (piece.type().equals(PieceType.PAWN)) {
+            if ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())) {
+                piece = new Piece(PieceType.QUEEN, piece.isWhite());
+            }
+        }
         pieces.put(to, piece);
     }
 

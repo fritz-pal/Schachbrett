@@ -44,11 +44,19 @@ public class Window extends JFrame {
 
     public void update(Board board) {
         List<Vec2> legalMoves = board.getAllLegalMoves(game.getSelectedTile());
+        Vec2 checkPos = null;
+        if (board.isInCheck(true)) {
+            checkPos = board.getKingPos(true);
+        } else if (board.isInCheck(false)) {
+            checkPos = board.getKingPos(false);
+        }
+
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();
             tile.setPiece(board.getPiece(pos));
             tile.setSelected(pos.equals(game.getSelectedTile()));
             tile.setLegalMove(legalMoves.contains(pos));
+            tile.setCheck(pos.equals(checkPos));
         }
         this.repaint();
     }
