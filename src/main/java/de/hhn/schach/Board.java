@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Board {
+public class Board implements Cloneable {
     private final Map<Vec2, Piece> pieces = new HashMap<>();
     private boolean whiteTurn;
 
@@ -31,6 +31,11 @@ public class Board {
             }
         }
         whiteTurn = fenParts[1] == null || fenParts[1].equals("w");
+    }
+
+    public Board(Map<Vec2, Piece> pieces, boolean whiteTurn) {
+        this.pieces.putAll(pieces);
+        this.whiteTurn = whiteTurn;
     }
 
     public static boolean isValidFen(String fen) {
@@ -103,6 +108,10 @@ public class Board {
         return pieces.get(pos);
     }
 
+    public Map<Vec2, Piece> getPieces() {
+        return pieces;
+    }
+
     public void setPiece(Vec2 pos, Piece piece) {
         pieces.put(pos, piece);
     }
@@ -113,31 +122,32 @@ public class Board {
     }
 
     public List<Vec2> getAllLegalMoves(Vec2 pos) {
+        List<Vec2> result = new ArrayList<>();
+
+        for (Vec2 move : getAllPseudoLegalMoves(pos)) {
+            if (ableToTakeKing(pos, move)) continue;
+            result.add(move);
+        }
+        return result;
+    }
+
+    private List<Vec2> getAllPseudoLegalMoves(Vec2 pos) {
         List<Vec2> moves = new ArrayList<>();
         if (!occupied(pos)) return moves;
         Piece piece = getPiece(pos);
         switch (piece.type()) {
-            case KING -> {
-                moves.addAll(getKingMoves(pos));
-            }
+            case KING -> moves.addAll(getKingMoves(pos));
             case QUEEN -> {
                 moves.addAll(getRookMoves(pos));
                 moves.addAll(getBishopMoves(pos));
 
             }
-            case ROOK -> {
-                moves.addAll(getRookMoves(pos));
-            }
-            case BISHOP -> {
-                moves.addAll(getBishopMoves(pos));
-            }
-            case KNIGHT -> {
-                moves.addAll(getKnightMoves(pos));
-            }
-            case PAWN -> {
-                moves.addAll(getPawnMoves(pos));
-            }
+            case ROOK -> moves.addAll(getRookMoves(pos));
+            case BISHOP -> moves.addAll(getBishopMoves(pos));
+            case KNIGHT -> moves.addAll(getKnightMoves(pos));
+            case PAWN -> moves.addAll(getPawnMoves(pos));
         }
+
         return moves;
     }
 
@@ -149,6 +159,21 @@ public class Board {
             }
         }
         return moves;
+    }
+
+    //returns true if opponent is able to take the king if that move is made
+    public boolean ableToTakeKing(Vec2 from, Vec2 to) {
+        Board tempBoard = this.clone();
+        tempBoard.move(from, to);
+        Vec2 kingPos = tempBoard.getKingPos(!tempBoard.isWhiteTurn());
+        for(Vec2 pos : tempBoard.getPieces().keySet()) {
+            if(tempBoard.getPiece(pos).isWhite() == tempBoard.isWhiteTurn()) {
+                if(tempBoard.getAllPseudoLegalMoves(pos).contains(kingPos)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private List<Vec2> getRookMoves(Vec2 pos) {
@@ -301,7 +326,7 @@ public class Board {
         return moves;
     }
 
-    private List<Vec2> inBoundsAndNotOccupied(Vec2 pos, int x, int y){
+    private List<Vec2> inBoundsAndNotOccupied(Vec2 pos, int x, int y) {
         List<Vec2> moves = new ArrayList<>();
         if (Vec2.isInBounds(x, y)) {
             Vec2 move = new Vec2(x, y);
@@ -316,18 +341,29 @@ public class Board {
         return whiteTurn;
     }
 
-    public void setTurn(boolean whiteTurn) {
-        this.whiteTurn = whiteTurn;
-    }
-
     public boolean occupied(Vec2 pos) {
         return pieces.containsKey(pos);
     }
 
     public void move(Vec2 from, Vec2 to) {
+        whiteTurn = !whiteTurn;
         Piece piece = pieces.remove(from);
         if (piece.type().equals(PieceType.PAWN) && ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())))
             piece = new Piece(PieceType.QUEEN, piece.isWhite());
         pieces.put(to, piece);
+    }
+
+    public Vec2 getKingPos(boolean white) {
+        for (Vec2 pos : pieces.keySet()) {
+            if (pieces.get(pos).type().equals(PieceType.KING) && pieces.get(pos).isWhite() == white) {
+                return pos;
+            }
+        }
+        throw new IllegalStateException("No king found");
+    }
+
+    @Override
+    protected Board clone() {
+        return new Board(this.pieces, whiteTurn);
     }
 }

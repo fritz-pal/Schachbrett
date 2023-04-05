@@ -22,9 +22,9 @@ public class PieceSelectedState implements State {
             return;
         }
         if (!board.occupied(pos) || board.getPiece(pos).isWhite() != board.isWhiteTurn()) {
+            System.out.println(board.ableToTakeKing(game.getSelectedTile(), pos));
             board.move(game.getSelectedTile(), pos);
             game.setSelectedTile(null);
-            board.setTurn(!board.isWhiteTurn());
             game.changeState(new TurnState(game));
         }
     }
