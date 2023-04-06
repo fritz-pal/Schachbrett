@@ -8,10 +8,10 @@ import java.util.Map;
 public class Board implements Cloneable {
     private final Map<Vec2, Piece> pieces = new HashMap<>();
     private Vec2 enPassant = null;
-    private boolean whiteCastleQ = true;
-    private boolean whiteCastleK = true;
-    private boolean blackCastleQ = true;
-    private boolean blackCastleK = true;
+    private boolean whiteCastleQ;
+    private boolean whiteCastleK;
+    private boolean blackCastleQ;
+    private boolean blackCastleK;
     private boolean whiteTurn;
 
     public Board() {
@@ -114,6 +114,17 @@ public class Board implements Cloneable {
         }
         fen.append(" ");
         fen.append(whiteTurn ? "w" : "b");
+        fen.append(" ");
+        if (whiteCastleQ || whiteCastleK || blackCastleQ || blackCastleK) {
+            if (whiteCastleQ) fen.append("Q");
+            if (whiteCastleK) fen.append("K");
+            if (blackCastleQ) fen.append("q");
+            if (blackCastleK) fen.append("k");
+        } else {
+            fen.append("-");
+        }
+        fen.append(" ");
+        fen.append(enPassant == null ? "-" : enPassant.toString());
         return fen.toString();
     }
 
@@ -150,6 +161,25 @@ public class Board implements Cloneable {
 
     public List<Vec2> getAllLegalMoves(Vec2 pos) {
         List<Vec2> result = new ArrayList<>();
+        if (pos == null) return result;
+        if (!occupied(pos)) return result;
+
+        if (pos.equals(new Vec2(0, 4)) && whiteTurn && !isInCheck(true)) {
+            if (whiteCastleK && !occupied(new Vec2(0, 5)) && !occupied(new Vec2(0, 6)) && !ableToTakeKing(pos, new Vec2(0, 5))) {
+                result.add(new Vec2(0, 6));
+            }
+            if (whiteCastleQ && !occupied(new Vec2(0, 3)) && !occupied(new Vec2(0, 2)) && !occupied(new Vec2(0, 1)) && !ableToTakeKing(pos, new Vec2(0, 3))) {
+                result.add(new Vec2(0, 2));
+            }
+        }
+        if(pos.equals(new Vec2(7, 4)) && !whiteTurn && !isInCheck(false)){
+            if (blackCastleK && !occupied(new Vec2(7, 5)) && !occupied(new Vec2(7, 6)) && !ableToTakeKing(pos, new Vec2(7, 5))) {
+                result.add(new Vec2(7, 6));
+            }
+            if (blackCastleQ && !occupied(new Vec2(7, 3)) && !occupied(new Vec2(7, 2)) && !occupied(new Vec2(7, 1)) && !ableToTakeKing(pos, new Vec2(7, 3))) {
+                result.add(new Vec2(7, 2));
+            }
+        }
 
         for (Vec2 move : getAllPseudoLegalMoves(pos)) {
             if (ableToTakeKing(pos, move)) continue;
@@ -193,6 +223,17 @@ public class Board implements Cloneable {
         Board tempBoard = this.clone();
         tempBoard.move(from, to);
         return tempBoard.isInCheck(!tempBoard.isWhiteTurn());
+    }
+
+    public boolean isCheckmate() {
+        for (Vec2 pos : pieces.keySet()) {
+            if (pieces.get(pos).isWhite() == whiteTurn) {
+                if (!getAllLegalMoves(pos).isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return isInCheck(whiteTurn);
     }
 
     public boolean isInCheck(boolean white) {
@@ -392,8 +433,41 @@ public class Board implements Cloneable {
             } else {
                 enPassant = null;
             }
+        } else enPassant = null;
+
+        if (piece.type().equals(PieceType.KING)) {
+            if (from.equals(new Vec2(0, 4)) && to.equals(new Vec2(0, 6))) {
+                Piece rook = pieces.remove(new Vec2(0, 7));
+                pieces.put(new Vec2(0, 5), rook);
+            }
+            if (from.equals(new Vec2(0, 4)) && to.equals(new Vec2(0, 2))) {
+                Piece rook = pieces.remove(new Vec2(0, 0));
+                pieces.put(new Vec2(0, 3), rook);
+            }
+            if (from.equals(new Vec2(7, 4)) && to.equals(new Vec2(7, 6))) {
+                Piece rook = pieces.remove(new Vec2(7, 7));
+                pieces.put(new Vec2(7, 5), rook);
+            }
+            if (from.equals(new Vec2(7, 4)) && to.equals(new Vec2(7, 2))) {
+                Piece rook = pieces.remove(new Vec2(7, 0));
+                pieces.put(new Vec2(7, 3), rook);
+            }
+
+            if (piece.isWhite()) {
+                whiteCastleK = false;
+                whiteCastleQ = false;
+            } else {
+                blackCastleK = false;
+                blackCastleQ = false;
+            }
         }
+        if (from.equals(new Vec2(0, 0))) whiteCastleQ = false;
+        if (from.equals(new Vec2(0, 7))) whiteCastleK = false;
+        if (from.equals(new Vec2(7, 0))) blackCastleQ = false;
+        if (from.equals(new Vec2(7, 7))) blackCastleK = false;
+
         pieces.put(to, piece);
+
     }
 
     public Vec2 getKingPos(boolean white) {
@@ -408,5 +482,9 @@ public class Board implements Cloneable {
     @Override
     protected Board clone() {
         return new Board(this.pieces, whiteTurn, enPassant, whiteCastleQ, whiteCastleK, blackCastleQ, blackCastleK);
+    }
+
+    public Vec2 getEnPassant() {
+        return enPassant;
     }
 }

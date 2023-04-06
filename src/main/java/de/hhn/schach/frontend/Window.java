@@ -43,6 +43,7 @@ public class Window extends JFrame {
     }
 
     public void update(Board board) {
+        System.out.println(board.getEnPassant());
         List<Vec2> legalMoves = board.getAllLegalMoves(game.getSelectedTile());
         Vec2 checkPos = null;
         if (board.isInCheck(true)) {
@@ -50,6 +51,7 @@ public class Window extends JFrame {
         } else if (board.isInCheck(false)) {
             checkPos = board.getKingPos(false);
         }
+        boolean checkmate = board.isCheckmate();
 
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();
@@ -57,6 +59,7 @@ public class Window extends JFrame {
             tile.setSelected(pos.equals(game.getSelectedTile()));
             tile.setLegalMove(legalMoves.contains(pos));
             tile.setCheck(pos.equals(checkPos));
+            if (checkmate && pos.equals(checkPos)) tile.setCheckmate(true);
         }
         this.repaint();
     }

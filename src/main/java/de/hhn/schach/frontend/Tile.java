@@ -21,6 +21,7 @@ public class Tile extends JButton {
     private boolean selected = false;
     private boolean legalMoveIcon = false;
     private boolean check = false;
+    private boolean checkmate = false;
 
     public Tile(Vec2 pos, Window window) {
         this.window = window;
@@ -54,6 +55,7 @@ public class Tile extends JButton {
                     System.out.println("Clicked " + pos);
                 }
             }
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.getButton() == 1 && mousePressed) {
@@ -70,7 +72,7 @@ public class Tile extends JButton {
     private ImageIcon emptyTileImage() {
         BufferedImage img = new BufferedImage(tileSize(), tileSize(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D imgGraphics = img.createGraphics();
-        if(check){
+        if (check) {
             imgGraphics.setColor(new Color(0xfa362c));
             imgGraphics.fillRect(0, 0, tileSize(), tileSize());
             return new ImageIcon(img);
@@ -128,6 +130,10 @@ public class Tile extends JButton {
             ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.type(), piece.isWhite(), rotated));
             imgGraphics.drawImage(pieceImg.getImage(), 0, 0, tileSize(), tileSize(), null);
         }
+        if (checkmate) {
+            ImageIcon checkmateImg = new ImageIcon(ImagePath.getResource("Checkmate.png"));
+            imgGraphics.drawImage(checkmateImg.getImage(), 0, 0, tileSize(), tileSize(), null);
+        }
         return new ImageIcon(img);
     }
 
@@ -146,7 +152,12 @@ public class Tile extends JButton {
     public void setLegalMove(boolean legalMoveIcon) {
         this.legalMoveIcon = legalMoveIcon;
     }
+
     public void setCheck(boolean check) {
         this.check = check;
+    }
+
+    public void setCheckmate(boolean checkmate){
+        this.checkmate = checkmate;
     }
 }
