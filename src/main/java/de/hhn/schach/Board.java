@@ -434,14 +434,16 @@ public class Board implements Cloneable {
         Piece piece = pieces.remove(from);
 
         String notation = piece.type().getNotation() + (occupied(to) ? "x" : "") + to.getName();
-        if (notation.startsWith("P")) {
-            notation = notation.substring(1);
-            if (notation.startsWith("x")) notation = from.getName().charAt(0) + notation;
-        } else {
-            Vec2 otherPiece = canOtherPieceGetTo(from, to, piece);
-            if (otherPiece != null) {
-                String other = otherPiece.getName();
-                notation = "" + notation.charAt(0) + from.getName().charAt((other.charAt(0) != from.getName().charAt(0)) ? 0 : 1) + notation.substring(1);
+        if(print) {
+            if (notation.startsWith("P")) {
+                notation = notation.substring(1);
+                if (notation.startsWith("x")) notation = from.getName().charAt(0) + notation;
+            } else {
+                Vec2 otherPiece = canOtherPieceGetTo(from, to, piece);
+                if (otherPiece != null) {
+                    String other = otherPiece.getName();
+                    notation = "" + notation.charAt(0) + from.getName().charAt((other.charAt(0) != from.getName().charAt(0)) ? 0 : 1) + notation.substring(1);
+                }
             }
         }
 
