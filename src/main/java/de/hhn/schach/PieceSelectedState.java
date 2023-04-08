@@ -23,7 +23,7 @@ public class PieceSelectedState implements State {
         }
         if (!board.occupied(pos) || board.getPiece(pos).isWhite() != board.isWhiteTurn()) {
             if(board.isLegalMove(game.getSelectedTile(), pos)) {
-                board.move(game.getSelectedTile(), pos);
+                board.move(game.getSelectedTile(), pos, true);
             }
             game.setSelectedTile(null);
             game.changeState(new TurnState(game));

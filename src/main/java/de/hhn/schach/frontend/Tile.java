@@ -52,7 +52,6 @@ public class Tile extends JButton {
                 if (e.getButton() == 1 && hovering) {
                     mousePressed = true;
                     window.game.getState().onTileClick(pos);
-                    System.out.println("Clicked " + pos);
                 }
             }
 

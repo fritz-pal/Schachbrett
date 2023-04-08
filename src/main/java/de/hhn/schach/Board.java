@@ -7,12 +7,14 @@ import java.util.Map;
 
 public class Board implements Cloneable {
     private final Map<Vec2, Piece> pieces = new HashMap<>();
-    private Vec2 enPassant = null;
+    private final List<Move> moveHistory = new ArrayList<>();
+    private Vec2 enPassant;
     private boolean whiteCastleQ;
     private boolean whiteCastleK;
     private boolean blackCastleQ;
     private boolean blackCastleK;
     private boolean whiteTurn;
+
 
     public Board() {
         this("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -172,7 +174,7 @@ public class Board implements Cloneable {
                 result.add(new Vec2(0, 2));
             }
         }
-        if(pos.equals(new Vec2(7, 4)) && !whiteTurn && !isInCheck(false)){
+        if (pos.equals(new Vec2(7, 4)) && !whiteTurn && !isInCheck(false)) {
             if (blackCastleK && !occupied(new Vec2(7, 5)) && !occupied(new Vec2(7, 6)) && !ableToTakeKing(pos, new Vec2(7, 5))) {
                 result.add(new Vec2(7, 6));
             }
@@ -221,7 +223,7 @@ public class Board implements Cloneable {
     //returns true if opponent is able to take the king if that move is made
     public boolean ableToTakeKing(Vec2 from, Vec2 to) {
         Board tempBoard = this.clone();
-        tempBoard.move(from, to);
+        tempBoard.move(from, to, false);
         return tempBoard.isInCheck(!tempBoard.isWhiteTurn());
     }
 
@@ -398,6 +400,16 @@ public class Board implements Cloneable {
         return moves;
     }
 
+    private Vec2 canOtherPieceGetTo(Vec2 from, Vec2 to, Piece piece) {
+        for (Vec2 pos : pieces.keySet()) {
+            if (pos.equals(from)) continue;
+            Piece p = pieces.get(pos);
+            if (!p.equals(piece)) continue;
+            if (getAllPseudoLegalMoves(pos).contains(to)) return pos;
+        }
+        return null;
+    }
+
     private List<Vec2> inBoundsAndNotOccupied(Vec2 pos, int x, int y) {
         List<Vec2> moves = new ArrayList<>();
         if (Vec2.isInBounds(x, y)) {
@@ -417,12 +429,26 @@ public class Board implements Cloneable {
         return pieces.containsKey(pos);
     }
 
-    public void move(Vec2 from, Vec2 to) {
+    public void move(Vec2 from, Vec2 to, boolean print) {
         whiteTurn = !whiteTurn;
         Piece piece = pieces.remove(from);
+
+        String notation = piece.type().getNotation() + (occupied(to) ? "x" : "") + to.getName();
+        if (notation.startsWith("P")) {
+            notation = notation.substring(1);
+            if (notation.startsWith("x")) notation = from.getName().charAt(0) + notation;
+        } else {
+            Vec2 otherPiece = canOtherPieceGetTo(from, to, piece);
+            if (otherPiece != null) {
+                String other = otherPiece.getName();
+                notation = "" + notation.charAt(0) + from.getName().charAt((other.charAt(0) != from.getName().charAt(0)) ? 0 : 1) + notation.substring(1);
+            }
+        }
+
         if (piece.type().equals(PieceType.PAWN)) {
             if ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())) {
                 piece = new Piece(PieceType.QUEEN, piece.isWhite());
+                notation += "=Q";
             }
             if (to.equals(enPassant)) pieces.remove(new Vec2(to.getX() + (piece.isWhite() ? -1 : 1), to.getY()));
 
@@ -439,18 +465,22 @@ public class Board implements Cloneable {
             if (from.equals(new Vec2(0, 4)) && to.equals(new Vec2(0, 6))) {
                 Piece rook = pieces.remove(new Vec2(0, 7));
                 pieces.put(new Vec2(0, 5), rook);
+                notation = "O-O";
             }
             if (from.equals(new Vec2(0, 4)) && to.equals(new Vec2(0, 2))) {
                 Piece rook = pieces.remove(new Vec2(0, 0));
                 pieces.put(new Vec2(0, 3), rook);
+                notation = "O-O-O";
             }
             if (from.equals(new Vec2(7, 4)) && to.equals(new Vec2(7, 6))) {
                 Piece rook = pieces.remove(new Vec2(7, 7));
                 pieces.put(new Vec2(7, 5), rook);
+                notation = "O-O";
             }
             if (from.equals(new Vec2(7, 4)) && to.equals(new Vec2(7, 2))) {
                 Piece rook = pieces.remove(new Vec2(7, 0));
                 pieces.put(new Vec2(7, 3), rook);
+                notation = "O-O-O";
             }
 
             if (piece.isWhite()) {
@@ -468,6 +498,14 @@ public class Board implements Cloneable {
 
         pieces.put(to, piece);
 
+        if (isInCheck(!piece.isWhite())) {
+            if (isCheckmate()) notation += "#";
+            else notation += "+";
+        }
+
+        moveHistory.add(new Move(from, to, piece, notation));
+
+        if (print) System.out.println(notation);
     }
 
     public Vec2 getKingPos(boolean white) {

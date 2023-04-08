@@ -43,7 +43,6 @@ public class Window extends JFrame {
     }
 
     public void update(Board board) {
-        System.out.println(board.getEnPassant());
         List<Vec2> legalMoves = board.getAllLegalMoves(game.getSelectedTile());
         Vec2 checkPos = null;
         if (board.isInCheck(true)) {

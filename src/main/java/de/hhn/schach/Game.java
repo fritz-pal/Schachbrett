@@ -23,7 +23,6 @@ public class Game {
     public void changeState(State state) {
         this.state = state;
         update();
-        System.out.println("Changed state to " + state.getClass().getSimpleName());
     }
 
     public Vec2 getSelectedTile() {
