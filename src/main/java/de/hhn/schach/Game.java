@@ -37,6 +37,10 @@ public class Game {
         window.update(mainBoard);
     }
 
+    public Window getWindow() {
+        return window;
+    }
+
     public Board getMainBoard() {
         return mainBoard;
     }

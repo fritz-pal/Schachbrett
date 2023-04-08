@@ -1,5 +1,7 @@
 package de.hhn.schach;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +16,10 @@ public class Board implements Cloneable {
     private boolean blackCastleQ;
     private boolean blackCastleK;
     private boolean whiteTurn;
-
+    private boolean checkmate = false;
+    private boolean stalemate = false;
+    private Result result = Result.NOTFINISHED;
+    private String fromFen = "";
 
     public Board() {
         this("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -22,6 +27,7 @@ public class Board implements Cloneable {
 
     public Board(String fen) {
         if (!isValidFen(fen)) fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        if (!fen.equals("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")) fromFen = fen;
         String[] fenParts = fen.split(" ");
         String[] fenRows = fenParts[0].split("/");
         for (int i = 0; i < 8; i++) {
@@ -228,6 +234,14 @@ public class Board implements Cloneable {
     }
 
     public boolean isCheckmate() {
+        return checkmate;
+    }
+
+    public boolean isStalemate() {
+        return stalemate;
+    }
+
+    public boolean checkIfCheckmate() {
         for (Vec2 pos : pieces.keySet()) {
             if (pieces.get(pos).isWhite() == whiteTurn) {
                 if (!getAllLegalMoves(pos).isEmpty()) {
@@ -236,6 +250,17 @@ public class Board implements Cloneable {
             }
         }
         return isInCheck(whiteTurn);
+    }
+
+    public boolean checkIfStalemate() {
+        for (Vec2 pos : pieces.keySet()) {
+            if (pieces.get(pos).isWhite() == whiteTurn) {
+                if (!getAllLegalMoves(pos).isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return !isInCheck(whiteTurn);
     }
 
     public boolean isInCheck(boolean white) {
@@ -248,6 +273,29 @@ public class Board implements Cloneable {
             }
         }
         return false;
+    }
+
+    public String getPGN() {
+        String result = checkmate ? (whiteTurn ? "0-1" : "1-0") : stalemate ? "1/2-1/2" : "*";
+        StringBuilder pgn = new StringBuilder("[Event \"?\"]\n");
+        pgn.append("[Site \"Schachbrett.jar\"]\n");
+        pgn.append("[Date \"").append(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))).append("\"]\n");
+        pgn.append("[Round \"?\"]\n");
+        pgn.append("[White \"?\"]\n");
+        pgn.append("[Black \"?\"]\n");
+        pgn.append("[Result \"").append(result).append("\"]\n");
+        if (!fromFen.isEmpty()) pgn.append("[FEN \"").append(fromFen).append("\"]\n");
+        pgn.append("\n");
+        int count = 1;
+        for (int i = 0; i < moveHistory.size(); i++) {
+            if (i % 2 == 0) {
+                pgn.append(count).append(". ");
+                count++;
+            }
+            pgn.append(moveHistory.get(i).getNotation()).append(" ");
+        }
+        pgn.append(result);
+        return pgn.toString();
     }
 
     private List<Vec2> getRookMoves(Vec2 pos) {
@@ -429,12 +477,12 @@ public class Board implements Cloneable {
         return pieces.containsKey(pos);
     }
 
-    public void move(Vec2 from, Vec2 to, boolean print) {
+    public void move(Vec2 from, Vec2 to, boolean isMainBoard) {
         whiteTurn = !whiteTurn;
         Piece piece = pieces.get(from);
 
         String notation = piece.type().getNotation() + (occupied(to) || to.equals(enPassant) ? "x" : "") + to.getName();
-        if(print) {
+        if (isMainBoard) {
             if (notation.startsWith("P")) {
                 notation = notation.substring(1);
                 if (notation.startsWith("x")) notation = from.getName().charAt(0) + notation;
@@ -501,14 +549,18 @@ public class Board implements Cloneable {
         pieces.remove(from);
         pieces.put(to, piece);
 
-        if (print && isInCheck(!piece.isWhite())) {
-            if (isCheckmate()) notation += "#";
-            else notation += "+";
+
+        if (isMainBoard) {
+            checkmate = checkIfCheckmate();
+            if (!checkmate) stalemate = checkIfStalemate();
+            if (checkmate) result = whiteTurn ? Result.BLACKWONBYCHECKMATE : Result.WHITEWONBYCHECKMATE;
+            else if (stalemate) result = Result.DRAWBYSTALEMATE;
+            if (isInCheck(!piece.isWhite())) {
+                if (isCheckmate()) notation += "#";
+                else notation += "+";
+            }
         }
-
         moveHistory.add(new Move(from, to, piece, notation));
-
-        if (print) System.out.println(notation);
     }
 
     public Vec2 getKingPos(boolean white) {
@@ -523,5 +575,9 @@ public class Board implements Cloneable {
     @Override
     protected Board clone() {
         return new Board(this.pieces, whiteTurn, enPassant, whiteCastleQ, whiteCastleK, blackCastleQ, blackCastleK);
+    }
+
+    public Result getResult() {
+        return result;
     }
 }

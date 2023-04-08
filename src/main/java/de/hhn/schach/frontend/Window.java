@@ -51,6 +51,7 @@ public class Window extends JFrame {
             checkPos = board.getKingPos(false);
         }
         boolean checkmate = board.isCheckmate();
+        if(checkmate) System.out.println(board.getPGN());
 
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();

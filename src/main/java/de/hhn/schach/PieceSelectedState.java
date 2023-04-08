@@ -1,5 +1,7 @@
 package de.hhn.schach;
 
+import de.hhn.schach.frontend.EndScreen;
+
 public class PieceSelectedState implements State {
 
     private final Game game;
@@ -22,8 +24,10 @@ public class PieceSelectedState implements State {
             return;
         }
         if (!board.occupied(pos) || board.getPiece(pos).isWhite() != board.isWhiteTurn()) {
-            if(board.isLegalMove(game.getSelectedTile(), pos)) {
+            if (board.isLegalMove(game.getSelectedTile(), pos)) {
                 board.move(game.getSelectedTile(), pos, true);
+                if (board.isCheckmate() || board.isStalemate())
+                    new EndScreen(board.getResult(), board.getPGN(), board.getFen(), game.getWindow());
             }
             game.setSelectedTile(null);
             game.changeState(new TurnState(game));
