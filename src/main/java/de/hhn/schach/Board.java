@@ -431,9 +431,9 @@ public class Board implements Cloneable {
 
     public void move(Vec2 from, Vec2 to, boolean print) {
         whiteTurn = !whiteTurn;
-        Piece piece = pieces.remove(from);
+        Piece piece = pieces.get(from);
 
-        String notation = piece.type().getNotation() + (occupied(to) ? "x" : "") + to.getName();
+        String notation = piece.type().getNotation() + (occupied(to) || to.equals(enPassant) ? "x" : "") + to.getName();
         if(print) {
             if (notation.startsWith("P")) {
                 notation = notation.substring(1);
@@ -498,9 +498,10 @@ public class Board implements Cloneable {
         if (from.equals(new Vec2(7, 0))) blackCastleQ = false;
         if (from.equals(new Vec2(7, 7))) blackCastleK = false;
 
+        pieces.remove(from);
         pieces.put(to, piece);
 
-        if (isInCheck(!piece.isWhite())) {
+        if (print && isInCheck(!piece.isWhite())) {
             if (isCheckmate()) notation += "#";
             else notation += "+";
         }
@@ -522,9 +523,5 @@ public class Board implements Cloneable {
     @Override
     protected Board clone() {
         return new Board(this.pieces, whiteTurn, enPassant, whiteCastleQ, whiteCastleK, blackCastleQ, blackCastleK);
-    }
-
-    public Vec2 getEnPassant() {
-        return enPassant;
     }
 }
