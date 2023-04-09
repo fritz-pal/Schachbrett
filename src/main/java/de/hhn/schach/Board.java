@@ -276,14 +276,13 @@ public class Board implements Cloneable {
     }
 
     public String getPGN() {
-        String result = checkmate ? (whiteTurn ? "0-1" : "1-0") : stalemate ? "1/2-1/2" : "*";
         StringBuilder pgn = new StringBuilder("[Event \"?\"]\n");
         pgn.append("[Site \"Schachbrett.jar\"]\n");
         pgn.append("[Date \"").append(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))).append("\"]\n");
         pgn.append("[Round \"?\"]\n");
         pgn.append("[White \"?\"]\n");
         pgn.append("[Black \"?\"]\n");
-        pgn.append("[Result \"").append(result).append("\"]\n");
+        pgn.append("[Result \"").append(result.getNotation()).append("\"]\n");
         if (!fromFen.isEmpty()) pgn.append("[FEN \"").append(fromFen).append("\"]\n");
         pgn.append("\n");
         int count = 1;
@@ -294,7 +293,7 @@ public class Board implements Cloneable {
             }
             pgn.append(moveHistory.get(i).getNotation()).append(" ");
         }
-        pgn.append(result);
+        pgn.append(result.getNotation());
         return pgn.toString();
     }
 

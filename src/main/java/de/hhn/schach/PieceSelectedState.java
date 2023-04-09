@@ -1,6 +1,7 @@
 package de.hhn.schach;
 
 import de.hhn.schach.frontend.EndScreen;
+import de.hhn.schach.frontend.Sound;
 
 public class PieceSelectedState implements State {
 

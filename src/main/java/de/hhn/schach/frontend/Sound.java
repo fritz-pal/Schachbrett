@@ -1,12 +1,12 @@
-package de.hhn.schach;
+package de.hhn.schach.frontend;
 
-import de.hhn.schach.frontend.ImagePath;
+import de.hhn.schach.Move;
 
 import javax.sound.sampled.*;
-import java.io.File;
+import javax.swing.*;
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.InputStream;
 
 public class Sound {
     public static void play(Move move) {
@@ -23,14 +23,13 @@ public class Sound {
             fileName = "checkmate.wav";
 
         try {
-            URL resource = ImagePath.class.getResource("/" + fileName);
-            File soundFile = new File(resource.toURI());
-
-            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+            InputStream soundStream = Sound.class.getResourceAsStream("/" + fileName);
+            InputStream bufferedIn = new BufferedInputStream(soundStream);
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(bufferedIn);
             Clip clip = AudioSystem.getClip();
             clip.open(audioIn);
             clip.start();
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException | URISyntaxException e) {
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             e.printStackTrace();
         }
     }
