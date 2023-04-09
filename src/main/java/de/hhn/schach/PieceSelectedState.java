@@ -25,7 +25,8 @@ public class PieceSelectedState implements State {
         }
         if (!board.occupied(pos) || board.getPiece(pos).isWhite() != board.isWhiteTurn()) {
             if (board.isLegalMove(game.getSelectedTile(), pos)) {
-                board.move(game.getSelectedTile(), pos, true);
+                Move move = board.move(game.getSelectedTile(), pos, true);
+                Sound.play(move);
                 if (board.isCheckmate() || board.isStalemate())
                     new EndScreen(board.getResult(), board.getPGN(), board.getFen(), game.getWindow());
             }

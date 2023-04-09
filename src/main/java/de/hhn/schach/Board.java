@@ -477,7 +477,7 @@ public class Board implements Cloneable {
         return pieces.containsKey(pos);
     }
 
-    public void move(Vec2 from, Vec2 to, boolean isMainBoard) {
+    public Move move(Vec2 from, Vec2 to, boolean isMainBoard) {
         whiteTurn = !whiteTurn;
         Piece piece = pieces.get(from);
 
@@ -560,7 +560,9 @@ public class Board implements Cloneable {
                 else notation += "+";
             }
         }
-        moveHistory.add(new Move(from, to, piece, notation));
+        Move move = new Move(from, to, piece, notation);
+        moveHistory.add(move);
+        return move;
     }
 
     public Vec2 getKingPos(boolean white) {

@@ -28,4 +28,23 @@ public class Move {
     public Piece getPiece() {
         return piece;
     }
+
+    public boolean isCapture() {
+        return notation.contains("x");
+    }
+
+    public boolean isCheck() {
+        return notation.contains("+") || notation.contains("#");
+    }
+
+    public boolean isCheckmate() {
+        return notation.contains("#");
+    }
+
+    public boolean isPromotion() {
+        return notation.contains("=");
+    }
+    public boolean isCastling() {
+        return notation.contains("O-O");
+    }
 }
