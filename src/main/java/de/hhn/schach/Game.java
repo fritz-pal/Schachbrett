@@ -12,7 +12,7 @@ public class Game {
         mainBoard = new Board(fen);
         window = new Window(this, rotatedPieces, rotatedBoard);
         window.setVisible(true);
-        window.update(mainBoard);
+        window.update(mainBoard, false);
         state = new TurnState(this);
     }
 
@@ -22,7 +22,7 @@ public class Game {
 
     public void changeState(State state) {
         this.state = state;
-        update();
+        update(state instanceof PieceSelectedState);
     }
 
     public Vec2 getSelectedTile() {
@@ -33,8 +33,8 @@ public class Game {
         this.selectedTile = selectedTile;
     }
 
-    public void update() {
-        window.update(mainBoard);
+    public void update(boolean performanceMode) {
+        window.update(mainBoard, performanceMode);
     }
 
     public Window getWindow() {

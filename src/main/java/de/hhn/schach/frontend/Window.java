@@ -42,8 +42,17 @@ public class Window extends JFrame {
         }
     }
 
-    public void update(Board board) {
+    public void update(Board board, boolean performanceMode) {
         List<Vec2> legalMoves = board.getAllLegalMoves(game.getSelectedTile());
+
+        if (performanceMode) {
+            for (Tile tile : tiles) {
+                tile.setSelected(tile.getPos().equals(game.getSelectedTile()));
+                tile.setLegalMove(legalMoves.contains(tile.getPos()));
+            }
+            return;
+        }
+
         Vec2 checkPos = null;
         if (board.isInCheck(true)) {
             checkPos = board.getKingPos(true);
@@ -51,7 +60,7 @@ public class Window extends JFrame {
             checkPos = board.getKingPos(false);
         }
         boolean checkmate = board.isCheckmate();
-        if(checkmate) System.out.println(board.getPGN());
+        if (checkmate) System.out.println(board.getPGN());
 
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();
@@ -61,7 +70,6 @@ public class Window extends JFrame {
             tile.setCheck(pos.equals(checkPos));
             if (checkmate && pos.equals(checkPos)) tile.setCheckmate(true);
         }
-        this.repaint();
     }
 
     public boolean isRotatedPieces() {

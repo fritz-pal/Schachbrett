@@ -4,6 +4,8 @@ import de.hhn.schach.Result;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class EndScreen extends JFrame {
 
@@ -32,6 +34,11 @@ public class EndScreen extends JFrame {
         fenField.setBackground(new Color(0x514e4b));
         fenField.setForeground(Color.WHITE);
         fenField.setFont(new Font("Arial", Font.PLAIN, 14));
+        fenField.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                fenField.selectAll();
+            }
+        });
         this.add(fenField);
 
         JTextArea pgnField = new JTextArea(pgn);
@@ -41,6 +48,12 @@ public class EndScreen extends JFrame {
         pgnField.setFont(new Font("Arial", Font.PLAIN, 14));
         pgnField.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
         pgnField.setLineWrap(true);
+        pgnField.setWrapStyleWord(true);
+        pgnField.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                pgnField.selectAll();
+            }
+        });
         this.add(pgnField);
 
 
