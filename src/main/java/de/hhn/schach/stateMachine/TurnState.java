@@ -1,4 +1,8 @@
-package de.hhn.schach;
+package de.hhn.schach.stateMachine;
+
+import de.hhn.schach.Board;
+import de.hhn.schach.Game;
+import de.hhn.schach.utils.Vec2;
 
 public class TurnState implements State {
 

@@ -1,6 +1,9 @@
-package de.hhn.schach;
+package de.hhn.schach.stateMachine;
 
-import de.hhn.schach.frontend.EndScreen;
+import de.hhn.schach.Board;
+import de.hhn.schach.Game;
+import de.hhn.schach.utils.Move;
+import de.hhn.schach.utils.Vec2;
 import de.hhn.schach.frontend.Sound;
 
 public class PieceSelectedState implements State {
@@ -28,8 +31,7 @@ public class PieceSelectedState implements State {
             if (board.isLegalMove(game.getSelectedTile(), pos)) {
                 Move move = board.move(game.getSelectedTile(), pos, true);
                 Sound.play(move);
-                if (board.isCheckmate() || board.isStalemate())
-                    new EndScreen(board.getResult(), board.getPGN(), board.getFen(), game.getWindow());
+                if (board.isCheckmate() || board.isStalemate()) game.gameEnded();
             }
             game.setSelectedTile(null);
             game.changeState(new TurnState(game));

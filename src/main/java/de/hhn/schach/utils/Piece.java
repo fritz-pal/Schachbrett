@@ -1,4 +1,4 @@
-package de.hhn.schach;
+package de.hhn.schach.utils;
 
 public record Piece(PieceType type, boolean isWhite) {
 

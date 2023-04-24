@@ -1,6 +1,6 @@
 package de.hhn.schach.frontend;
 
-import de.hhn.schach.Result;
+import de.hhn.schach.utils.Result;
 
 import javax.swing.*;
 import java.awt.*;

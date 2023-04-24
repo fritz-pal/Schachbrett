@@ -1,7 +1,7 @@
 package de.hhn.schach.frontend;
 
 
-import de.hhn.schach.PieceType;
+import de.hhn.schach.utils.PieceType;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

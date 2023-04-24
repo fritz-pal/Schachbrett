@@ -1,7 +1,7 @@
 package de.hhn.schach.frontend;
 
-import de.hhn.schach.Piece;
-import de.hhn.schach.Vec2;
+import de.hhn.schach.utils.Piece;
+import de.hhn.schach.utils.Vec2;
 
 import javax.swing.*;
 import java.awt.*;

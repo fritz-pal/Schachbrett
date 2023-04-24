@@ -1,4 +1,4 @@
-package de.hhn.schach;
+package de.hhn.schach.utils;
 
 public class Vec2 {
     private final int X;

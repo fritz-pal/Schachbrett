@@ -1,5 +1,7 @@
 package de.hhn.schach;
 
+import de.hhn.schach.utils.*;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ public class Board implements Cloneable {
     private boolean stalemate = false;
     private Result result = Result.NOTFINISHED;
     private String fromFen = "";
+    private int movesWithoutCaptureOrPawnMove = 0;
+    private int moveNumber = 1;
 
     public Board() {
         this("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -75,7 +79,7 @@ public class Board implements Cloneable {
     public static boolean isValidFen(String fen) {
         if (fen == null || fen.isEmpty()) return false;
         String[] fenParts = fen.split(" ");
-
+        if (fenParts.length != 6) return false;
         String[] fenRows = fenParts[0].split("/");
         if (fenRows.length != 8) return false;
         for (int i = 0; i < 8; i++) {
@@ -91,9 +95,15 @@ public class Board implements Cloneable {
             }
             if (number != 8) return false;
         }
-        if (fenParts[1] != null && !fenParts[1].equals("w") && !fenParts[1].equals("b")) return false;
-        if (fenParts[2] != null && !fenParts[2].matches("[KQkq-]{1,4}")) return false;
-        if (fenParts[3] != null && !fenParts[3].matches("[a-h][1-8]|-")) return false;
+        if (!fenParts[1].equals("w") && !fenParts[1].equals("b")) return false;
+        if (!fenParts[2].matches("[KQkq-]{1,4}")) return false;
+        if (!fenParts[3].matches("[a-h][1-8]|-")) return false;
+        try {
+            Integer.parseInt(fenParts[4]);
+            Integer.parseInt(fenParts[5]);
+        } catch (NumberFormatException e) {
+            return false;
+        }
         return true;
     }
 
@@ -291,7 +301,7 @@ public class Board implements Cloneable {
                 pgn.append(count).append(". ");
                 count++;
             }
-            pgn.append(moveHistory.get(i).getNotation()).append(" ");
+            pgn.append(moveHistory.get(i).notation()).append(" ");
         }
         pgn.append(result.getNotation());
         return pgn.toString();
@@ -559,6 +569,9 @@ public class Board implements Cloneable {
                 else notation += "+";
             }
         }
+        if (occupied(to) || piece.type().equals(PieceType.PAWN)) movesWithoutCaptureOrPawnMove = 0;
+        else movesWithoutCaptureOrPawnMove++;
+
         Move move = new Move(from, to, piece, notation);
         moveHistory.add(move);
         return move;

@@ -2,7 +2,7 @@ package de.hhn.schach.frontend;
 
 import de.hhn.schach.Board;
 import de.hhn.schach.Game;
-import de.hhn.schach.Vec2;
+import de.hhn.schach.utils.Vec2;
 
 import javax.swing.*;
 import java.awt.*;

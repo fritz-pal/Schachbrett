@@ -1,9 +1,8 @@
 package de.hhn.schach.frontend;
 
-import de.hhn.schach.Move;
+import de.hhn.schach.utils.Move;
 
 import javax.sound.sampled.*;
-import javax.swing.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
