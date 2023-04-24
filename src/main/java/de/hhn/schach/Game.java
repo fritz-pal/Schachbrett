@@ -8,6 +8,9 @@ import de.hhn.schach.stateMachine.*;
 import de.hhn.schach.utils.Move;
 import de.hhn.schach.utils.Vec2;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class Game {
     private final Board mainBoard;
     private final Window window;
@@ -27,15 +30,20 @@ public class Game {
         this.blackName = blackName;
         this.whiteElo = whiteElo;
         this.blackElo = blackElo;
-        engineWhite = rotatedBoard;
         mainBoard = new Board(this, fen);
         window = new Window(this, rotatedPieces, rotatedBoard);
         window.setVisible(true);
         window.update(mainBoard, false);
         if (againstEngine) {
+            if (mainBoard.isCustomFen() && (mainBoard.isWhiteTurn() && rotatedBoard || !mainBoard.isWhiteTurn() && !rotatedBoard)) {
+                    engineWhite = !rotatedBoard;
+            } else {
+                engineWhite = rotatedBoard;
+            }
             uci = new UCIProtocol(this);
             state = new TurnAgainstEngineState(this);
         } else {
+            engineWhite = false;
             uci = null;
             state = new TurnState(this);
         }
@@ -48,7 +56,14 @@ public class Game {
     public void changeState(State state) {
         this.state = state;
         update(state instanceof PieceSelectedState);
-        if (ended) endScreen = new EndScreen(mainBoard.getResult(), mainBoard.getPGN(), mainBoard.getFen(), this);
+        if (ended) {
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    endScreen = new EndScreen(mainBoard.getResult(), mainBoard.getPGN(), mainBoard.getFen(), Game.this);
+                }
+            }, 1000);
+        }
     }
 
     public Vec2 getSelectedTile() {
