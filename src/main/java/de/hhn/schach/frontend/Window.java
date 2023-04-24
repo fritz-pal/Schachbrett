@@ -6,6 +6,8 @@ import de.hhn.schach.utils.Vec2;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,7 @@ public class Window extends JFrame {
         this.rotatedBoard = rotatedBoard;
         this.rotatedPieces = rotatedPieces;
 
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.setSize(800, 800);
         this.getContentPane().setPreferredSize(new Dimension(800, 800));
         this.pack();
@@ -32,6 +34,12 @@ public class Window extends JFrame {
         this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
         this.getContentPane().setBackground(new Color(0x312e2b));
         this.setResizable(true);
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                game.stop();
+            }
+        });
 
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {

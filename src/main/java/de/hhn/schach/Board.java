@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Board implements Cloneable {
+    private final Game game;
     private final Map<Vec2, Piece> pieces = new HashMap<>();
     private final List<Move> moveHistory = new ArrayList<>();
     private Vec2 enPassant;
@@ -25,11 +26,12 @@ public class Board implements Cloneable {
     private int movesWithoutCaptureOrPawnMove = 0;
     private int moveNumber = 1;
 
-    public Board() {
-        this("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    public Board(Game game) {
+        this(game, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 
-    public Board(String fen) {
+    public Board(Game game, String fen) {
+        this.game = game;
         if (!isValidFen(fen)) fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         if (!fen.equals("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")) fromFen = fen;
         String[] fenParts = fen.split(" ");
@@ -47,26 +49,19 @@ public class Board implements Cloneable {
                 }
             }
         }
-        whiteTurn = fenParts[1] == null || fenParts[1].equals("w");
-        if (fenParts[2] == null) {
-            whiteCastleQ = true;
-            whiteCastleK = true;
-            blackCastleQ = true;
-            blackCastleK = true;
-        } else {
-            whiteCastleQ = fenParts[2].contains("Q");
-            whiteCastleK = fenParts[2].contains("K");
-            blackCastleQ = fenParts[2].contains("q");
-            blackCastleK = fenParts[2].contains("k");
-        }
-        if (fenParts[3] == null || fenParts[3].equals("-")) {
-            enPassant = null;
-        } else {
-            enPassant = new Vec2(fenParts[3]);
-        }
+        whiteTurn = fenParts[1].equals("w");
+
+        whiteCastleQ = fenParts[2].contains("Q");
+        whiteCastleK = fenParts[2].contains("K");
+        blackCastleQ = fenParts[2].contains("q");
+        blackCastleK = fenParts[2].contains("k");
+
+        if (fenParts[3].equals("-")) enPassant = null;
+        else enPassant = new Vec2(fenParts[3]);
     }
 
-    public Board(Map<Vec2, Piece> pieces, boolean whiteTurn, Vec2 enPassant, boolean whiteCastleQ, boolean whiteCastleK, boolean blackCastleQ, boolean blackCastleK) {
+    public Board(Game game, Map<Vec2, Piece> pieces, boolean whiteTurn, Vec2 enPassant, boolean whiteCastleQ, boolean whiteCastleK, boolean blackCastleQ, boolean blackCastleK) {
+        this.game = game;
         this.pieces.putAll(pieces);
         this.whiteTurn = whiteTurn;
         this.enPassant = enPassant;
@@ -143,6 +138,10 @@ public class Board implements Cloneable {
         }
         fen.append(" ");
         fen.append(enPassant == null ? "-" : enPassant.toString());
+        fen.append(" ");
+        fen.append(movesWithoutCaptureOrPawnMove);
+        fen.append(" ");
+        fen.append(moveNumber);
         return fen.toString();
     }
 
@@ -167,6 +166,14 @@ public class Board implements Cloneable {
 
     public Map<Vec2, Piece> getPieces() {
         return pieces;
+    }
+
+    public String getAllMovesInEngineNotation() {
+        StringBuilder moves = new StringBuilder();
+        for (Move move : moveHistory) {
+            moves.append(" ").append(move.getEngineNotation());
+        }
+        return moves.toString();
     }
 
     public void setPiece(Vec2 pos, Piece piece) {
@@ -289,9 +296,10 @@ public class Board implements Cloneable {
         StringBuilder pgn = new StringBuilder("[Event \"?\"]\n");
         pgn.append("[Site \"Schachbrett.jar\"]\n");
         pgn.append("[Date \"").append(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))).append("\"]\n");
-        pgn.append("[Round \"?\"]\n");
-        pgn.append("[White \"?\"]\n");
-        pgn.append("[Black \"?\"]\n");
+        pgn.append("[White \"").append(game.getName(true).isBlank() ? "?" : game.getName(true)).append("\"]\n");
+        pgn.append("[Black \"").append(game.getName(false).isBlank() ? "?" : game.getName(false)).append("\"]\n");
+        pgn.append("[WhiteElo \"").append(game.getElo(true) == -1 ? "?" : game.getElo(true)).append("\"]\n");
+        pgn.append("[BlackElo \"").append(game.getElo(false) == -1 ? "?" : game.getElo(false)).append("\"]\n");
         pgn.append("[Result \"").append(result.getNotation()).append("\"]\n");
         if (!fromFen.isEmpty()) pgn.append("[FEN \"").append(fromFen).append("\"]\n");
         pgn.append("\n");
@@ -305,6 +313,10 @@ public class Board implements Cloneable {
         }
         pgn.append(result.getNotation());
         return pgn.toString();
+    }
+
+    public String getFromFen() {
+        return fromFen;
     }
 
     private List<Vec2> getRookMoves(Vec2 pos) {
@@ -568,13 +580,16 @@ public class Board implements Cloneable {
                 if (isCheckmate()) notation += "#";
                 else notation += "+";
             }
-        }
-        if (occupied(to) || piece.type().equals(PieceType.PAWN)) movesWithoutCaptureOrPawnMove = 0;
-        else movesWithoutCaptureOrPawnMove++;
 
-        Move move = new Move(from, to, piece, notation);
-        moveHistory.add(move);
-        return move;
+            if (occupied(to) || piece.type().equals(PieceType.PAWN)) movesWithoutCaptureOrPawnMove = 0;
+            else movesWithoutCaptureOrPawnMove++;
+            if (!piece.isWhite()) moveNumber++;
+
+            Move move = new Move(from, to, piece, notation);
+            moveHistory.add(move);
+            return move;
+        }
+        return null;
     }
 
     public Vec2 getKingPos(boolean white) {
@@ -588,7 +603,7 @@ public class Board implements Cloneable {
 
     @Override
     protected Board clone() {
-        return new Board(this.pieces, whiteTurn, enPassant, whiteCastleQ, whiteCastleK, blackCastleQ, blackCastleK);
+        return new Board(game, pieces, whiteTurn, enPassant, whiteCastleQ, whiteCastleK, blackCastleQ, blackCastleK);
     }
 
     public Result getResult() {

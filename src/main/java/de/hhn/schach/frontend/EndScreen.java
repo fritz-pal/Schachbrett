@@ -1,15 +1,18 @@
 package de.hhn.schach.frontend;
 
+import de.hhn.schach.Game;
 import de.hhn.schach.utils.Result;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class EndScreen extends JFrame {
 
-    public EndScreen(Result result, String pgn, String fen, Window window) {
+    public EndScreen(Result result, String pgn, String fen, Game game) {
         super();
         this.setTitle(result.toString());
         this.setLayout(null);
@@ -19,7 +22,7 @@ public class EndScreen extends JFrame {
         this.pack();
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setLocationRelativeTo(window);
+        this.setLocationRelativeTo(game.getWindow());
         this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
 
         JLabel titleLabel = new JLabel((result.toString()));

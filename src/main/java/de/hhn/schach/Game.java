@@ -1,29 +1,44 @@
 package de.hhn.schach;
 
+import de.hhn.schach.engine.UCIProtocol;
 import de.hhn.schach.frontend.EndScreen;
+import de.hhn.schach.frontend.Sound;
 import de.hhn.schach.frontend.Window;
-import de.hhn.schach.stateMachine.PieceSelectedState;
-import de.hhn.schach.stateMachine.State;
-import de.hhn.schach.stateMachine.TurnState;
+import de.hhn.schach.stateMachine.*;
+import de.hhn.schach.utils.Move;
 import de.hhn.schach.utils.Vec2;
 
 public class Game {
     private final Board mainBoard;
     private final Window window;
+    private final String whiteName;
+    private final String blackName;
+    private final int whiteElo;
+    private final int blackElo;
+    private final boolean engineWhite;
+    private final UCIProtocol uci;
     private State state;
     private Vec2 selectedTile = null;
-    private final String whiteName = "";
-    private final String blackName = "";
-    private final int whiteElo = -1;
-    private final int blackElo = -1;
     private boolean ended = false;
+    private EndScreen endScreen = null;
 
-    public Game(boolean rotatedPieces, boolean rotatedBoard, String fen) {
-        mainBoard = new Board(fen);
+    public Game(boolean rotatedPieces, boolean rotatedBoard, boolean againstEngine, String fen, String whiteName, String blackName, int whiteElo, int blackElo) {
+        this.whiteName = whiteName;
+        this.blackName = blackName;
+        this.whiteElo = whiteElo;
+        this.blackElo = blackElo;
+        engineWhite = rotatedBoard;
+        mainBoard = new Board(this, fen);
         window = new Window(this, rotatedPieces, rotatedBoard);
         window.setVisible(true);
         window.update(mainBoard, false);
-        state = new TurnState(this);
+        if (againstEngine) {
+            uci = new UCIProtocol(this);
+            state = new TurnAgainstEngineState(this);
+        } else {
+            uci = null;
+            state = new TurnState(this);
+        }
     }
 
     public State getState() {
@@ -33,8 +48,7 @@ public class Game {
     public void changeState(State state) {
         this.state = state;
         update(state instanceof PieceSelectedState);
-        if (ended) new EndScreen(mainBoard.getResult(), mainBoard.getPGN(), mainBoard.getFen(), window);
-
+        if (ended) endScreen = new EndScreen(mainBoard.getResult(), mainBoard.getPGN(), mainBoard.getFen(), this);
     }
 
     public Vec2 getSelectedTile() {
@@ -57,7 +71,40 @@ public class Game {
         return mainBoard;
     }
 
-    public void gameEnded() {
+    public void endGame() {
         this.ended = true;
+    }
+
+    public String getName(boolean white) {
+        return white ? whiteName : blackName;
+    }
+
+    public int getElo(boolean white) {
+        return white ? whiteElo : blackElo;
+    }
+
+    public boolean isEngineWhite() {
+        return engineWhite;
+    }
+
+    public void foundMove(String notation) {
+        Vec2 from = new Vec2(notation.substring(0, 2));
+        Vec2 to = new Vec2(notation.substring(2, 4));
+        Move move = mainBoard.move(from, to, true);
+        Sound.play(move);
+        if (mainBoard.isCheckmate() || mainBoard.isStalemate()) endGame();
+        changeState(new TurnAgainstEngineState(this));
+    }
+
+    public void startEngine() {
+        selectedTile = null;
+        changeState(new EnginePonderState());
+        uci.startSearching();
+    }
+
+    public void stop() {
+        if (uci != null) uci.quit();
+        if (window != null) window.dispose();
+        if (endScreen != null) endScreen.dispose();
     }
 }

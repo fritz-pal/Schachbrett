@@ -31,7 +31,7 @@ public class PieceSelectedState implements State {
             if (board.isLegalMove(game.getSelectedTile(), pos)) {
                 Move move = board.move(game.getSelectedTile(), pos, true);
                 Sound.play(move);
-                if (board.isCheckmate() || board.isStalemate()) game.gameEnded();
+                if (board.isCheckmate() || board.isStalemate()) game.endGame();
             }
             game.setSelectedTile(null);
             game.changeState(new TurnState(game));
