@@ -88,6 +88,7 @@ public class Game {
     }
 
     public void foundMove(String notation) {
+        uci.printInfo();
         Vec2 from = new Vec2(notation.substring(0, 2));
         Vec2 to = new Vec2(notation.substring(2, 4));
         Move move = mainBoard.move(from, to, true);
