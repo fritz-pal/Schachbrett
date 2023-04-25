@@ -2,10 +2,9 @@ package de.hhn.schach;
 
 import de.hhn.schach.engine.UCIProtocol;
 import de.hhn.schach.frontend.EndScreen;
-import de.hhn.schach.frontend.Sound;
 import de.hhn.schach.frontend.Window;
 import de.hhn.schach.stateMachine.*;
-import de.hhn.schach.utils.Move;
+import de.hhn.schach.utils.PieceType;
 import de.hhn.schach.utils.Vec2;
 
 import java.util.Timer;
@@ -20,11 +19,11 @@ public class Game {
     private final int blackElo;
     private final boolean engineWhite;
     private final UCIProtocol uci;
+    private final boolean againstEngine;
     private State state;
     private Vec2 selectedTile = null;
     private boolean ended = false;
     private EndScreen endScreen = null;
-    private final boolean againstEngine;
     private String engineName = "Stockfish";
 
     public Game(boolean rotatedPieces, boolean rotatedBoard, boolean againstEngine, String fen, String whiteName, String blackName, int whiteElo, int blackElo) {
@@ -39,7 +38,7 @@ public class Game {
         window.update(mainBoard, false);
         if (againstEngine) {
             if (mainBoard.isCustomFen() && (mainBoard.isWhiteTurn() && rotatedBoard || !mainBoard.isWhiteTurn() && !rotatedBoard)) {
-                    engineWhite = !rotatedBoard;
+                engineWhite = !rotatedBoard;
             } else {
                 engineWhite = rotatedBoard;
             }
@@ -93,12 +92,12 @@ public class Game {
         this.ended = true;
     }
 
-    public void setEngineName(String engineName) {
-        this.engineName = engineName;
-    }
-
     public String getEngineName() {
         return engineName;
+    }
+
+    public void setEngineName(String engineName) {
+        this.engineName = engineName;
     }
 
     public String getName(boolean white) {
@@ -121,8 +120,7 @@ public class Game {
         uci.printInfo();
         Vec2 from = new Vec2(notation.substring(0, 2));
         Vec2 to = new Vec2(notation.substring(2, 4));
-        Move move = mainBoard.move(from, to, true);
-        Sound.play(move);
+        mainBoard.move(from, to, true, notation.length() > 4 ? PieceType.fromNotation(notation.charAt(4)) : null);
         if (mainBoard.isCheckmate() || mainBoard.isStalemate()) endGame();
         changeState(new TurnAgainstEngineState(this));
     }

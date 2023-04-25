@@ -1,6 +1,6 @@
 package de.hhn.schach.utils;
 
-public record Move(Vec2 from, Vec2 to, Piece piece, String notation) {
+public record Move(Vec2 from, Vec2 to, Piece piece, String notation, PieceType promotionType) {
     public boolean isCapture() {
         return notation.contains("x");
     }
@@ -23,6 +23,6 @@ public record Move(Vec2 from, Vec2 to, Piece piece, String notation) {
 
     public String getEngineNotation() {
         if (!isPromotion()) return from.getName() + to.getName();
-        return from.getName() + to.getName() + (notation.charAt(notation.length() - 1) + "").toLowerCase();
+        return from.getName() + to.getName() + Character.toLowerCase(promotionType.getNotation());
     }
 }

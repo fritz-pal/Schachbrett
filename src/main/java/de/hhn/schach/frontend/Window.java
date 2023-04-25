@@ -15,7 +15,7 @@ public class Window extends JFrame {
     public final Game game;
     private final boolean rotatedPieces;
     private final boolean rotatedBoard;
-    List<Tile> tiles = new ArrayList<>();
+    private final List<Tile> tiles = new ArrayList<>();
 
     public Window(Game game, boolean rotatedPieces, boolean rotatedBoard) {
         super();
@@ -78,6 +78,13 @@ public class Window extends JFrame {
             tile.setCheck(pos.equals(checkPos));
             if (checkmate && pos.equals(checkPos)) tile.setCheckmate(true);
         }
+    }
+
+    public Tile getTile(Vec2 pos) {
+        for (Tile tile : tiles) {
+            if (tile.getPos().equals(pos)) return tile;
+        }
+        throw new IllegalArgumentException("Tile not found");
     }
 
     public boolean isRotatedPieces() {

@@ -1,5 +1,6 @@
 package de.hhn.schach;
 
+import de.hhn.schach.frontend.Sound;
 import de.hhn.schach.utils.*;
 
 import java.time.LocalDate;
@@ -13,7 +14,7 @@ public class Board implements Cloneable {
     private final Game game;
     private final Map<Vec2, Piece> pieces = new HashMap<>();
     private final List<Move> moveHistory = new ArrayList<>();
-    private Vec2 enPassant;
+    private Vec2 enCroissant;
     private boolean whiteCastleQ;
     private boolean whiteCastleK;
     private boolean blackCastleQ;
@@ -52,15 +53,15 @@ public class Board implements Cloneable {
         blackCastleQ = fenParts[2].contains("q");
         blackCastleK = fenParts[2].contains("k");
 
-        if (fenParts[3].equals("-")) enPassant = null;
-        else enPassant = new Vec2(fenParts[3]);
+        if (fenParts[3].equals("-")) enCroissant = null;
+        else enCroissant = new Vec2(fenParts[3]);
     }
 
-    public Board(Game game, Map<Vec2, Piece> pieces, boolean whiteTurn, Vec2 enPassant, boolean whiteCastleQ, boolean whiteCastleK, boolean blackCastleQ, boolean blackCastleK) {
+    public Board(Game game, Map<Vec2, Piece> pieces, boolean whiteTurn, Vec2 enCroissant, boolean whiteCastleQ, boolean whiteCastleK, boolean blackCastleQ, boolean blackCastleK) {
         this.game = game;
         this.pieces.putAll(pieces);
         this.whiteTurn = whiteTurn;
-        this.enPassant = enPassant;
+        this.enCroissant = enCroissant;
         this.whiteCastleQ = whiteCastleQ;
         this.whiteCastleK = whiteCastleK;
         this.blackCastleQ = blackCastleQ;
@@ -133,7 +134,7 @@ public class Board implements Cloneable {
             fen.append("-");
         }
         fen.append(" ");
-        fen.append(enPassant == null ? "-" : enPassant.toString());
+        fen.append(enCroissant == null ? "-" : enCroissant.toString());
         fen.append(" ");
         fen.append(movesWithoutCaptureOrPawnMove);
         fen.append(" ");
@@ -170,6 +171,13 @@ public class Board implements Cloneable {
 
     public boolean isLegalMove(Vec2 from, Vec2 to) {
         return getAllLegalMoves(from).contains(to);
+    }
+
+    public boolean isPromotingMove(Vec2 from, Vec2 to) {
+        Piece piece = pieces.get(from);
+        if (piece == null) return false;
+        if (piece.type() != PieceType.PAWN) return false;
+        return (to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite());
     }
 
     public List<Vec2> getAllLegalMoves(Vec2 pos) {
@@ -240,7 +248,7 @@ public class Board implements Cloneable {
             e.printStackTrace();
             return false;
         }
-        tempBoard.move(from, to, false);
+        tempBoard.move(from, to, false, PieceType.QUEEN);
         return tempBoard.isInCheck(!tempBoard.isWhiteTurn());
     }
 
@@ -457,14 +465,14 @@ public class Board implements Cloneable {
         }
         if (pos.getY() - 1 >= 0) {
             move = new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 1 : -1), pos.getY() - 1);
-            if ((occupied(move) && getPiece(move).isWhite() != getPiece(pos).isWhite()) || (enPassant != null && enPassant.equals(move))) {
+            if ((occupied(move) && getPiece(move).isWhite() != getPiece(pos).isWhite()) || (enCroissant != null && enCroissant.equals(move))) {
                 moves.add(move);
             }
         }
 
         if (pos.getY() + 1 < 8) {
             move = new Vec2(pos.getX() + (getPiece(pos).isWhite() ? 1 : -1), pos.getY() + 1);
-            if ((occupied(move) && getPiece(move).isWhite() != getPiece(pos).isWhite()) || (enPassant != null && enPassant.equals(move))) {
+            if ((occupied(move) && getPiece(move).isWhite() != getPiece(pos).isWhite()) || (enCroissant != null && enCroissant.equals(move))) {
                 moves.add(move);
             }
         }
@@ -502,13 +510,13 @@ public class Board implements Cloneable {
         return pieces.containsKey(pos);
     }
 
-    public Move move(Vec2 from, Vec2 to, boolean isMainBoard) {
+    public void move(Vec2 from, Vec2 to, boolean isMainBoard, PieceType promotion) {
         whiteTurn = !whiteTurn;
         Piece piece = pieces.get(from);
         if (piece == null)
             throw new IllegalArgumentException("Illegal move: " + from.getName() + to.getName() + " (no piece at " + from.getName() + ")");
 
-        String notation = piece.type().getNotation() + (occupied(to) || to.equals(enPassant) ? "x" : "") + to.getName();
+        String notation = piece.type().getNotation() + (occupied(to) || to.equals(enCroissant) ? "x" : "") + to.getName();
         if (isMainBoard) {
             if (notation.startsWith("P")) {
                 notation = notation.substring(1);
@@ -517,26 +525,30 @@ public class Board implements Cloneable {
                 Vec2 otherPiece = canOtherPieceGetTo(from, to, piece);
                 if (otherPiece != null) {
                     String other = otherPiece.getName();
-                    notation = "" + notation.charAt(0) + from.getName().charAt((other.charAt(0) != from.getName().charAt(0)) ? 0 : 1) + notation.substring(1);
+                    notation = String.valueOf(notation.charAt(0)) + from.getName().charAt((other.charAt(0) != from.getName().charAt(0)) ? 0 : 1) + notation.substring(1);
                 }
             }
         }
 
         if (piece.type().equals(PieceType.PAWN)) {
             if ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())) {
-                piece = new Piece(PieceType.QUEEN, piece.isWhite());
-                notation += "=Q";
+                if (promotion != null) {
+                    piece = new Piece(promotion, piece.isWhite());
+                    notation += "=" + promotion.getNotation();
+                } else {
+                    throw new IllegalArgumentException("Illegal move: " + from.getName() + to.getName() + " (no promotion)");
+                }
             }
-            if (to.equals(enPassant)) pieces.remove(new Vec2(to.getX() + (piece.isWhite() ? -1 : 1), to.getY()));
+            if (to.equals(enCroissant)) pieces.remove(new Vec2(to.getX() + (piece.isWhite() ? -1 : 1), to.getY()));
 
             if (from.getX() == 1 && to.getX() == 3) {
-                enPassant = new Vec2(2, to.getY());
+                enCroissant = new Vec2(2, to.getY());
             } else if (from.getX() == 6 && to.getX() == 4) {
-                enPassant = new Vec2(5, to.getY());
+                enCroissant = new Vec2(5, to.getY());
             } else {
-                enPassant = null;
+                enCroissant = null;
             }
-        } else enPassant = null;
+        } else enCroissant = null;
 
         if (piece.type().equals(PieceType.KING)) {
             if (from.equals(new Vec2(0, 4)) && to.equals(new Vec2(0, 6))) {
@@ -591,11 +603,10 @@ public class Board implements Cloneable {
             else movesWithoutCaptureOrPawnMove++;
             if (!piece.isWhite()) moveNumber++;
 
-            Move move = new Move(from, to, piece, notation);
+            Move move = new Move(from, to, piece, notation, promotion);
             moveHistory.add(move);
-            return move;
+            Sound.play(move);
         }
-        return null;
     }
 
     public Vec2 getKingPos(boolean white) {
@@ -610,7 +621,7 @@ public class Board implements Cloneable {
     @Override
     protected Board clone() throws CloneNotSupportedException {
         super.clone();
-        return new Board(game, pieces, whiteTurn, enPassant, whiteCastleQ, whiteCastleK, blackCastleQ, blackCastleK);
+        return new Board(game, pieces, whiteTurn, enCroissant, whiteCastleQ, whiteCastleK, blackCastleQ, blackCastleK);
     }
 
     public Result getResult() {

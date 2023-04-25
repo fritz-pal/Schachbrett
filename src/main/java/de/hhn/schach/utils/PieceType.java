@@ -1,11 +1,11 @@
 package de.hhn.schach.utils;
 
 public enum PieceType {
-    PAWN('P'),
-    KNIGHT('N'),
-    BISHOP('B'),
-    ROOK('R'),
     QUEEN('Q'),
+    ROOK('R'),
+    BISHOP('B'),
+    KNIGHT('N'),
+    PAWN('P'),
     KING('K');
 
     private final char notation;
@@ -16,7 +16,7 @@ public enum PieceType {
 
     public static PieceType fromNotation(char notation) {
         for (PieceType pieceType : values()) {
-            if (pieceType.getNotation() == notation) {
+            if (pieceType.getNotation() == Character.toUpperCase(notation)) {
                 return pieceType;
             }
         }

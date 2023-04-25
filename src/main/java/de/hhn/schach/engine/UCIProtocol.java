@@ -23,13 +23,20 @@ public class UCIProtocol {
         Engine engine = new Engine();
         engine.start();
         new Timer().schedule(new TimerTask() {
+            int counter = 0;
+
             @Override
             public void run() {
-                UCIProtocol.this.process = engine.process;
-                sendCommand("uci");
-                new CommandListener(UCIProtocol.this, process);
+                counter++;
+                if (engine.process != null) {
+                    UCIProtocol.this.process = engine.process;
+                    sendCommand("uci");
+                    new CommandListener(UCIProtocol.this, process);
+                    System.out.println("Engine started in " + counter * 10 + "ms.");
+                    cancel();
+                }
             }
-        }, 500);
+        }, 10, 10);
     }
 
     public void sendCommand(String command) {

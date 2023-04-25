@@ -2,9 +2,8 @@ package de.hhn.schach.stateMachine;
 
 import de.hhn.schach.Board;
 import de.hhn.schach.Game;
-import de.hhn.schach.utils.Move;
+import de.hhn.schach.frontend.PromotionWindow;
 import de.hhn.schach.utils.Vec2;
-import de.hhn.schach.frontend.Sound;
 
 public class PieceSelectedState implements State {
 
@@ -29,8 +28,11 @@ public class PieceSelectedState implements State {
         }
         if (!board.occupied(pos) || board.getPiece(pos).isWhite() != board.isWhiteTurn()) {
             if (board.isLegalMove(game.getSelectedTile(), pos)) {
-                Move move = board.move(game.getSelectedTile(), pos, true);
-                Sound.play(move);
+                if (board.isPromotingMove(game.getSelectedTile(), pos)) {
+                    new PromotionWindow(game, board.isWhiteTurn(), pos);
+                    return;
+                }
+                board.move(game.getSelectedTile(), pos, true, null);
                 if (board.isCheckmate() || board.isStalemate()) game.endGame();
             }
             game.setSelectedTile(null);
