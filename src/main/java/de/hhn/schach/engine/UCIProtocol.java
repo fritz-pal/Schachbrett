@@ -68,7 +68,7 @@ public class UCIProtocol {
     public void startSearching() {
         String command = posCommand + " moves" + game.getMainBoard().getAllMovesInEngineNotation();
         sendCommand(command);
-        System.out.println(command);
+//System.out.println(command);
         sendCommand("go movetime 2000");
     }
 

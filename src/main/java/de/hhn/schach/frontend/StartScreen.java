@@ -2,8 +2,10 @@ package de.hhn.schach.frontend;
 
 import de.hhn.schach.Board;
 import de.hhn.schach.Game;
+import de.hhn.schach.Main;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 
 public class StartScreen extends JFrame {
@@ -96,6 +98,15 @@ public class StartScreen extends JFrame {
         errorLabel.setForeground(new Color(0xfa362c));
         this.getContentPane().add(errorLabel, 0);
 
+        JButton engineButton = new JButton("Engine");
+        engineButton.setBounds(10, 10, 90, 25);
+        engineButton.setFont(new Font("Arial Black", Font.PLAIN, 14));
+        engineButton.setForeground(Color.WHITE);
+        engineButton.setBackground(new Color(0x514e4b));
+        engineButton.setFocusable(false);
+        engineButton.addActionListener(e -> new EngineSelector(this));
+        this.getContentPane().add(engineButton, 0);
+
         JButton startButton = new JButton("Start Game");
         startButton.setBounds(250, 525, 200, 50);
         startButton.setFont(new Font("Arial Black", Font.PLAIN, 14));
@@ -104,6 +115,10 @@ public class StartScreen extends JFrame {
         startButton.setFocusable(false);
         startButton.addActionListener(e -> {
             try {
+                if (singlePlayer.isSelected() && (Main.enginePath == null || Main.enginePath.isBlank())) {
+                    errorLabel.setText("No engine detected!");
+                    return;
+                }
                 boolean validFen = Board.isValidFen(fenInput.getText());
                 if (validFen || fenInput.getText().equals("")) {
                     new Game(rotatedPieces.isSelected(),

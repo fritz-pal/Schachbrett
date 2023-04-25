@@ -1,7 +1,13 @@
 package de.hhn.schach.engine;
 
+import de.hhn.schach.Main;
+
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
@@ -10,14 +16,14 @@ public class Stockfish extends Thread {
 
     public void run() {
         try {
-            process = new ProcessBuilder("D:\\Program Files\\stockfish_15.1\\stockfish-windows-2022-x86-64-avx2.exe").start();
+            process = new ProcessBuilder(Main.enginePath).start();
             int errorCode = process.waitFor();
             if (errorCode != 0) {
                 try (BufferedReader reader = process.errorReader(StandardCharsets.UTF_8)) {
                     throw new RuntimeException(String.format("Program execution failed (code %d): %s", errorCode,
                             reader.lines().collect(Collectors.joining())));
                 }
-            }else{
+            } else {
                 System.out.println("Process terminated successfully.");
                 System.exit(0);
             }
