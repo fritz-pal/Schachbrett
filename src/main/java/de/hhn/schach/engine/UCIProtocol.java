@@ -43,7 +43,7 @@ public class UCIProtocol {
     }
 
     public void receiveCommand(String command, String[] params) {
-//System.out.println(command + Arrays.toString(params));
+//        System.out.println(command + Arrays.toString(params));
         switch (command) {
             case "uciok" -> sendCommand("isready");
             case "readyok" -> sendCommand("ucinewgame");
@@ -62,13 +62,16 @@ public class UCIProtocol {
                     }
                 }
             }
+            case "id" -> {
+                if (params[0].equals("name")) game.setEngineName(String.join(" ", params).substring(5));
+            }
         }
     }
 
     public void startSearching() {
         String command = posCommand + " moves" + game.getMainBoard().getAllMovesInEngineNotation();
         sendCommand(command);
-//System.out.println(command);
+//        System.out.println(command);
         sendCommand("go movetime 2000");
     }
 

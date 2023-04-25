@@ -24,12 +24,15 @@ public class Game {
     private Vec2 selectedTile = null;
     private boolean ended = false;
     private EndScreen endScreen = null;
+    private final boolean againstEngine;
+    private String engineName = "Stockfish";
 
     public Game(boolean rotatedPieces, boolean rotatedBoard, boolean againstEngine, String fen, String whiteName, String blackName, int whiteElo, int blackElo) {
         this.whiteName = whiteName;
         this.blackName = blackName;
         this.whiteElo = whiteElo;
         this.blackElo = blackElo;
+        this.againstEngine = againstEngine;
         mainBoard = new Board(this, fen);
         window = new Window(this, rotatedPieces, rotatedBoard);
         window.setVisible(true);
@@ -90,12 +93,24 @@ public class Game {
         this.ended = true;
     }
 
+    public void setEngineName(String engineName) {
+        this.engineName = engineName;
+    }
+
+    public String getEngineName() {
+        return engineName;
+    }
+
     public String getName(boolean white) {
         return white ? whiteName : blackName;
     }
 
     public int getElo(boolean white) {
         return white ? whiteElo : blackElo;
+    }
+
+    public boolean isAgainstEngine() {
+        return againstEngine;
     }
 
     public boolean isEngineWhite() {

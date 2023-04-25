@@ -296,10 +296,20 @@ public class Board implements Cloneable {
         StringBuilder pgn = new StringBuilder("[Event \"?\"]\n");
         pgn.append("[Site \"Schachbrett.jar\"]\n");
         pgn.append("[Date \"").append(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))).append("\"]\n");
-        pgn.append("[White \"").append(game.getName(true).isBlank() ? "?" : game.getName(true)).append("\"]\n");
-        pgn.append("[Black \"").append(game.getName(false).isBlank() ? "?" : game.getName(false)).append("\"]\n");
-        pgn.append("[WhiteElo \"").append(game.getElo(true) == -1 ? "?" : game.getElo(true)).append("\"]\n");
-        pgn.append("[BlackElo \"").append(game.getElo(false) == -1 ? "?" : game.getElo(false)).append("\"]\n");
+        if (game.isAgainstEngine() && game.isEngineWhite()) {
+            pgn.append("[White \"").append(game.getEngineName()).append("\"]\n");
+            pgn.append("[WhiteElo \"3000\"]\n");
+        } else {
+            pgn.append("[White \"").append(game.getName(true).isBlank() ? "?" : game.getName(true)).append("\"]\n");
+            pgn.append("[WhiteElo \"").append(game.getElo(true) == -1 ? "?" : game.getElo(true)).append("\"]\n");
+        }
+        if (game.isAgainstEngine() && !game.isEngineWhite()) {
+            pgn.append("[Black \"").append(game.getEngineName()).append("\"]\n");
+            pgn.append("[BlackElo \"3000\"]\n");
+        } else {
+            pgn.append("[Black \"").append(game.getName(false).isBlank() ? "?" : game.getName(false)).append("\"]\n");
+            pgn.append("[BlackElo \"").append(game.getElo(false) == -1 ? "?" : game.getElo(false)).append("\"]\n");
+        }
         pgn.append("[Result \"").append(result.getNotation()).append("\"]\n");
         if (!fromFen.isEmpty()) pgn.append("[FEN \"").append(fromFen).append("\"]\n");
         pgn.append("\n");
@@ -501,7 +511,8 @@ public class Board implements Cloneable {
     public Move move(Vec2 from, Vec2 to, boolean isMainBoard) {
         whiteTurn = !whiteTurn;
         Piece piece = pieces.get(from);
-        if(piece == null) throw new IllegalArgumentException("Illegal move: " + from.getName() + to.getName() + " (no piece at " + from.getName() + ")");
+        if (piece == null)
+            throw new IllegalArgumentException("Illegal move: " + from.getName() + to.getName() + " (no piece at " + from.getName() + ")");
 
         String notation = piece.type().getNotation() + (occupied(to) || to.equals(enPassant) ? "x" : "") + to.getName();
         if (isMainBoard) {
