@@ -26,10 +26,6 @@ public class Board implements Cloneable {
     private int movesWithoutCaptureOrPawnMove = 0;
     private int moveNumber = 1;
 
-    public Board(Game game) {
-        this(game, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    }
-
     public Board(Game game, String fen) {
         this.game = game;
         if (!isValidFen(fen)) fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -164,20 +160,12 @@ public class Board implements Cloneable {
         return pieces.get(pos);
     }
 
-    public Map<Vec2, Piece> getPieces() {
-        return pieces;
-    }
-
     public String getAllMovesInEngineNotation() {
         StringBuilder moves = new StringBuilder();
         for (Move move : moveHistory) {
             moves.append(" ").append(move.getEngineNotation());
         }
         return moves.toString();
-    }
-
-    public void setPiece(Vec2 pos, Piece piece) {
-        pieces.put(pos, piece);
     }
 
     public boolean isLegalMove(Vec2 from, Vec2 to) {
@@ -245,7 +233,13 @@ public class Board implements Cloneable {
 
     //returns true if opponent is able to take the king if that move is made
     public boolean ableToTakeKing(Vec2 from, Vec2 to) {
-        Board tempBoard = this.clone();
+        Board tempBoard;
+        try {
+            tempBoard = this.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return false;
+        }
         tempBoard.move(from, to, false);
         return tempBoard.isInCheck(!tempBoard.isWhiteTurn());
     }
@@ -614,7 +608,8 @@ public class Board implements Cloneable {
     }
 
     @Override
-    protected Board clone() {
+    protected Board clone() throws CloneNotSupportedException {
+        super.clone();
         return new Board(game, pieces, whiteTurn, enPassant, whiteCastleQ, whiteCastleK, blackCastleQ, blackCastleK);
     }
 

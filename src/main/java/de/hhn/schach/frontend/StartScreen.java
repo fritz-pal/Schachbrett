@@ -5,7 +5,6 @@ import de.hhn.schach.Game;
 import de.hhn.schach.Main;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 
 public class StartScreen extends JFrame {

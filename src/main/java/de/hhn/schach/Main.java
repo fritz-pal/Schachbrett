@@ -33,15 +33,17 @@ public class Main {
         String appDirectory = System.getProperty("user.home") + File.separator + "AppData" + File.separator + "Roaming" + File.separator + "Schachbrett";
         File directory = new File(appDirectory);
         if (!directory.exists()) {
-            directory.mkdir();
-        }
-        if (enginePath == null) enginePath = "";
-        try {
-            FileWriter writer = new FileWriter(appDirectory + File.separator + "enginePath.txt");
-            writer.write(enginePath);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (!directory.mkdir()) {
+                throw new RuntimeException("Could not create directory " + appDirectory);
+            }
+            if (enginePath == null) enginePath = "";
+            try {
+                FileWriter writer = new FileWriter(appDirectory + File.separator + "enginePath.txt");
+                writer.write(enginePath);
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

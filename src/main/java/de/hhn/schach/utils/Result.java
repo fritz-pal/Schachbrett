@@ -28,7 +28,7 @@ public enum Result {
         };
     }
 
-    public String getNotation(){
+    public String getNotation() {
         return switch (this) {
             case WHITEWONBYCHECKMATE -> "1-0";
             case BLACKWONBYCHECKMATE -> "0-1";

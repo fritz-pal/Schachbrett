@@ -16,8 +16,7 @@ public class Engine extends Thread {
             int errorCode = process.waitFor();
             if (errorCode != 0) {
                 try (BufferedReader reader = process.errorReader(StandardCharsets.UTF_8)) {
-                    throw new RuntimeException(String.format("Program execution failed (code %d): %s", errorCode,
-                            reader.lines().collect(Collectors.joining())));
+                    throw new RuntimeException(String.format("Program execution failed (code %d): %s", errorCode, reader.lines().collect(Collectors.joining())));
                 }
             }
         } catch (IOException e) {

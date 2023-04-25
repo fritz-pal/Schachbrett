@@ -21,10 +21,6 @@ public class Vec2 {
         this.X = (int) name.charAt(1) - (int) '1';
     }
 
-    public static String getName(int x, int y) {
-        return new Vec2(x, y).getName();
-    }
-
     private static boolean isValidName(String name) {
         if (name.length() == 2) {
             name = name.toLowerCase();

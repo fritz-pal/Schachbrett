@@ -23,6 +23,7 @@ public class Sound {
 
         try {
             InputStream soundStream = Sound.class.getResourceAsStream("/" + fileName);
+            if (soundStream == null) throw new IOException("Sound file not found: " + fileName);
             InputStream bufferedIn = new BufferedInputStream(soundStream);
             AudioInputStream audioIn = AudioSystem.getAudioInputStream(bufferedIn);
             Clip clip = AudioSystem.getClip();

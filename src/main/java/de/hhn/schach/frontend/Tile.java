@@ -156,7 +156,7 @@ public class Tile extends JButton {
         this.check = check;
     }
 
-    public void setCheckmate(boolean checkmate){
+    public void setCheckmate(boolean checkmate) {
         this.checkmate = checkmate;
     }
 }

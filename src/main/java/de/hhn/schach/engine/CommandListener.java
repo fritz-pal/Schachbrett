@@ -25,7 +25,7 @@ public class CommandListener extends Thread {
             while ((line = br.readLine()) != null) {
                 String[] split = line.split(" ");
                 String command = split[0];
-                if(split.length == 1) {
+                if (split.length == 1) {
                     uci.receiveCommand(command, new String[0]);
                     continue;
                 }
