@@ -2,6 +2,7 @@ package de.hhn.schach.frontend;
 
 import de.hhn.schach.Board;
 import de.hhn.schach.Game;
+import de.hhn.schach.stateMachine.PieceSelectedAgainstEngineState;
 import de.hhn.schach.stateMachine.PieceSelectedState;
 import de.hhn.schach.stateMachine.TurnAgainstEngineState;
 import de.hhn.schach.stateMachine.TurnState;
@@ -16,7 +17,7 @@ import java.awt.event.MouseEvent;
 public class PromotionButton extends JButton {
     public PromotionButton(Game game, boolean white, Vec2 position, PieceType type, PromotionWindow parent) {
         JButton button = new JButton();
-        button.setBackground(new Color(0x312e2b));
+        button.setBackground(Color.pink);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
         button.setFocusable(false);
@@ -30,7 +31,7 @@ public class PromotionButton extends JButton {
                 game.setSelectedTile(null);
                 if (game.getState() instanceof PieceSelectedState) {
                     game.changeState(new TurnState(game));
-                } else {
+                } else if (game.getState() instanceof PieceSelectedAgainstEngineState) {
                     game.startEngine();
                     game.changeState(new TurnAgainstEngineState(game));
                 }

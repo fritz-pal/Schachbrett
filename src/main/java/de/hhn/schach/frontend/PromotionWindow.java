@@ -1,6 +1,10 @@
 package de.hhn.schach.frontend;
 
 import de.hhn.schach.Game;
+import de.hhn.schach.stateMachine.PieceSelectedAgainstEngineState;
+import de.hhn.schach.stateMachine.PieceSelectedState;
+import de.hhn.schach.stateMachine.TurnAgainstEngineState;
+import de.hhn.schach.stateMachine.TurnState;
 import de.hhn.schach.utils.PieceType;
 import de.hhn.schach.utils.Vec2;
 
@@ -20,6 +24,11 @@ public class PromotionWindow extends JFrame {
         this.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
+                if (game.getState() instanceof PieceSelectedState) {
+                    game.changeState(new TurnState(game));
+                } else if (game.getState() instanceof PieceSelectedAgainstEngineState) {
+                    game.changeState(new TurnAgainstEngineState(game));
+                }
                 game.setSelectedTile(null);
                 PromotionWindow.this.dispose();
             }
