@@ -43,7 +43,6 @@ public class UCIProtocol {
     }
 
     public void receiveCommand(String command, String[] params) {
-//        System.out.println(command + Arrays.toString(params));
         switch (command) {
             case "uciok" -> sendCommand("isready");
             case "readyok" -> sendCommand("ucinewgame");
@@ -71,7 +70,6 @@ public class UCIProtocol {
     public void startSearching() {
         String command = posCommand + " moves" + game.getMainBoard().getAllMovesInEngineNotation();
         sendCommand(command);
-//        System.out.println(command);
         sendCommand("go movetime 2000");
     }
 
