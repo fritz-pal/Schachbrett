@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-public class Stockfish extends Thread {
+public class Engine extends Thread {
     Process process;
 
     public void run() {

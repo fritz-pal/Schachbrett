@@ -20,12 +20,12 @@ public class UCIProtocol {
         if (!game.getMainBoard().getFromFen().isEmpty())
             posCommand = "position fen " + game.getMainBoard().getFromFen();
 
-        Stockfish stockfish = new Stockfish();
-        stockfish.start();
+        Engine engine = new Engine();
+        engine.start();
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                UCIProtocol.this.process = stockfish.process;
+                UCIProtocol.this.process = engine.process;
                 sendCommand("uci");
                 new CommandListener(UCIProtocol.this, process);
             }
