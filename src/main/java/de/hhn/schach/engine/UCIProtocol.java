@@ -53,7 +53,10 @@ public class UCIProtocol {
 
     public void receiveCommand(String command, String[] params) {
         switch (command) {
-            case "uciok" -> sendCommand("isready");
+            case "uciok" -> {
+                sendCommand("setoption name Skill Level value 0");
+                sendCommand("isready");
+            }
             case "readyok" -> {
                 sendCommand("ucinewgame");
                 if (autoStart) startSearching();
@@ -78,6 +81,7 @@ public class UCIProtocol {
             }
         }
     }
+
 
     public void startSearching() {
         String command = posCommand + " moves" + game.getMainBoard().getAllMovesInEngineNotation();
