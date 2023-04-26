@@ -24,18 +24,23 @@ public class PromotionWindow extends JFrame {
         this.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
+                game.setSelectedTile(null);
                 if (game.getState() instanceof PieceSelectedState) {
                     game.changeState(new TurnState(game));
                 } else if (game.getState() instanceof PieceSelectedAgainstEngineState) {
                     game.changeState(new TurnAgainstEngineState(game));
                 }
-                game.setSelectedTile(null);
                 PromotionWindow.this.dispose();
             }
         });
-
-        for (int i = 0; i < 4; i++) {
-            new PromotionButton(game, white, position, PieceType.values()[i], this);
+        if (game.isRotated(white)) {
+            for (int i = 3; i >= 0; i--) {
+                new PromotionButton(game, white, position, PieceType.values()[i], this);
+            }
+        } else {
+            for (int i = 0; i < 4; i++) {
+                new PromotionButton(game, white, position, PieceType.values()[i], this);
+            }
         }
         this.setVisible(true);
     }

@@ -4,7 +4,6 @@ import de.hhn.schach.Board;
 import de.hhn.schach.Game;
 import de.hhn.schach.stateMachine.PieceSelectedAgainstEngineState;
 import de.hhn.schach.stateMachine.PieceSelectedState;
-import de.hhn.schach.stateMachine.TurnAgainstEngineState;
 import de.hhn.schach.stateMachine.TurnState;
 import de.hhn.schach.utils.PieceType;
 import de.hhn.schach.utils.Vec2;
@@ -16,13 +15,12 @@ import java.awt.event.MouseEvent;
 
 public class PromotionButton extends JButton {
     public PromotionButton(Game game, boolean white, Vec2 position, PieceType type, PromotionWindow parent) {
-        JButton button = new JButton();
-        button.setBackground(Color.pink);
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        button.setFocusable(false);
-        button.setIcon(new ImageIcon(ImagePath.getPieceImage(type, white, false)));
-        button.addMouseListener(new MouseAdapter() {
+        this.setBackground(new Color(!white ? 0xf2f3f5 : 0x312e2b));
+        this.setBorderPainted(false);
+        this.setFocusPainted(false);
+        this.setFocusable(false);
+        this.setIcon(new ImageIcon(ImagePath.getPieceImage(type, white, game.isRotated(white))));
+        this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Board board = game.getMainBoard();
@@ -33,21 +31,20 @@ public class PromotionButton extends JButton {
                     game.changeState(new TurnState(game));
                 } else if (game.getState() instanceof PieceSelectedAgainstEngineState) {
                     game.startEngine();
-                    game.changeState(new TurnAgainstEngineState(game));
                 }
                 parent.dispose();
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(0x514e4b));
+                PromotionButton.this.setBackground(new Color(!white ? 0xe3e5e8 : 0x514e4b));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(new Color(0x312e2b));
+                PromotionButton.this.setBackground(new Color(!white ? 0xf2f3f5 : 0x312e2b));
             }
         });
-        parent.add(button);
+        parent.add(this);
     }
 }

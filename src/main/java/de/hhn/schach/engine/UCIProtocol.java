@@ -9,13 +9,15 @@ import java.util.TimerTask;
 
 public class UCIProtocol {
     private final Game game;
+    private final boolean autoStart;
     private int depth = 0;
     private int cp = 0;
     private int mate = 0;
     private Process process;
     private String posCommand = "position startpos";
 
-    public UCIProtocol(Game game) {
+    public UCIProtocol(Game game, boolean autoStart) {
+        this.autoStart = autoStart;
         this.game = game;
         if (!game.getMainBoard().getFromFen().isEmpty())
             posCommand = "position fen " + game.getMainBoard().getFromFen();
@@ -52,7 +54,10 @@ public class UCIProtocol {
     public void receiveCommand(String command, String[] params) {
         switch (command) {
             case "uciok" -> sendCommand("isready");
-            case "readyok" -> sendCommand("ucinewgame");
+            case "readyok" -> {
+                sendCommand("ucinewgame");
+                if (autoStart) startSearching();
+            }
             case "bestmove" -> game.foundMove(params[0]);
             case "info" -> {
                 for (int i = 0; i < params.length; i++) {

@@ -12,17 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Window extends JFrame {
-    public final Game game;
-    private final boolean rotatedPieces;
-    private final boolean rotatedBoard;
+    private final Game game;
     private final List<Tile> tiles = new ArrayList<>();
 
-    public Window(Game game, boolean rotatedPieces, boolean rotatedBoard) {
+    public Window(Game game) {
         super();
         this.game = game;
-        this.rotatedBoard = rotatedBoard;
-        this.rotatedPieces = rotatedPieces;
-
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.setSize(800, 800);
         this.getContentPane().setPreferredSize(new Dimension(800, 800));
@@ -44,7 +39,7 @@ public class Window extends JFrame {
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
                 Vec2 pos = new Vec2(x, y);
-                Tile tile = new Tile(pos, this);
+                Tile tile = new Tile(game, pos, this);
                 this.tiles.add(tile);
             }
         }
@@ -85,13 +80,5 @@ public class Window extends JFrame {
             if (tile.getPos().equals(pos)) return tile;
         }
         throw new IllegalArgumentException("Tile not found");
-    }
-
-    public boolean isRotatedPieces() {
-        return rotatedPieces;
-    }
-
-    public boolean isRotatedBoard() {
-        return rotatedBoard;
     }
 }

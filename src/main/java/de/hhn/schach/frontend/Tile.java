@@ -1,5 +1,6 @@
 package de.hhn.schach.frontend;
 
+import de.hhn.schach.Game;
 import de.hhn.schach.utils.Piece;
 import de.hhn.schach.utils.Vec2;
 
@@ -12,6 +13,7 @@ import java.awt.image.BufferedImage;
 
 public class Tile extends JButton {
     private final Vec2 pos;
+    private final Game game;
     private final boolean isWhite;
     private final Point translatedPos;
     Window window;
@@ -23,11 +25,12 @@ public class Tile extends JButton {
     private boolean check = false;
     private boolean checkmate = false;
 
-    public Tile(Vec2 pos, Window window) {
+    public Tile(Game game, Vec2 pos, Window window) {
         this.window = window;
         this.pos = pos;
+        this.game = game;
         this.isWhite = (pos.getX() + pos.getY() + 1) % 2 == 0;
-        translatedPos = new Point((!window.isRotatedBoard() ? pos.getY() : (7 - pos.getY())) * tileSize(), (window.isRotatedBoard() ? pos.getX() : (7 - pos.getX())) * tileSize());
+        translatedPos = new Point((!game.isRotatedBoard() ? pos.getY() : (7 - pos.getY())) * tileSize(), (game.isRotatedBoard() ? pos.getX() : (7 - pos.getX())) * tileSize());
         this.setBounds(translatedPos.x, translatedPos.y, tileSize(), tileSize());
         this.setContentAreaFilled(false);
         this.setBorderPainted(false);
@@ -51,7 +54,7 @@ public class Tile extends JButton {
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == 1 && hovering) {
                     mousePressed = true;
-                    window.game.getState().onTileClick(pos);
+                    game.getState().onTileClick(pos);
                 }
             }
 
@@ -100,12 +103,12 @@ public class Tile extends JButton {
 
     private void calcPosition() {
         if (window.getContentPane().getHeight() > window.getContentPane().getWidth()) {
-            translatedPos.x = (!window.isRotatedBoard() ? pos.getY() : (7 - pos.getY())) * tileSize();
-            translatedPos.y = (window.isRotatedBoard() ? pos.getX() : (7 - pos.getX())) * tileSize() + ((window.getContentPane().getHeight() - window.getContentPane().getWidth()) / 2);
+            translatedPos.x = (!game.isRotatedBoard() ? pos.getY() : (7 - pos.getY())) * tileSize();
+            translatedPos.y = (game.isRotatedBoard() ? pos.getX() : (7 - pos.getX())) * tileSize() + ((window.getContentPane().getHeight() - window.getContentPane().getWidth()) / 2);
         }
         if (window.getContentPane().getHeight() < window.getContentPane().getWidth()) {
-            translatedPos.x = (!window.isRotatedBoard() ? pos.getY() : (7 - pos.getY())) * tileSize() + ((window.getContentPane().getWidth() - window.getContentPane().getHeight()) / 2);
-            translatedPos.y = (window.isRotatedBoard() ? pos.getX() : (7 - pos.getX())) * tileSize();
+            translatedPos.x = (!game.isRotatedBoard() ? pos.getY() : (7 - pos.getY())) * tileSize() + ((window.getContentPane().getWidth() - window.getContentPane().getHeight()) / 2);
+            translatedPos.y = (game.isRotatedBoard() ? pos.getX() : (7 - pos.getX())) * tileSize();
         }
     }
 
@@ -125,8 +128,7 @@ public class Tile extends JButton {
 
         imgGraphics.drawImage(this.emptyTileImage().getImage(), 0, 0, null);
         if (piece != null) {
-            boolean rotated = !piece.isWhite() && window.isRotatedPieces() && !window.isRotatedBoard() || piece.isWhite() && window.isRotatedPieces() && window.isRotatedBoard();
-            ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.type(), piece.isWhite(), rotated));
+            ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.type(), piece.isWhite(), game.isRotated(piece.isWhite())));
             imgGraphics.drawImage(pieceImg.getImage(), 0, 0, tileSize(), tileSize(), null);
         }
         if (checkmate) {

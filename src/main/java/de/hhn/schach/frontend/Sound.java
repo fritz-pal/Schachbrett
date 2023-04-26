@@ -22,7 +22,7 @@ public class Sound {
             fileName = "checkmate.wav";
 
         try {
-            InputStream soundStream = Sound.class.getResourceAsStream("/" + fileName);
+            InputStream soundStream = Sound.class.getResourceAsStream("/sound/" + fileName);
             if (soundStream == null) throw new IOException("Sound file not found: " + fileName);
             InputStream bufferedIn = new BufferedInputStream(soundStream);
             AudioInputStream audioIn = AudioSystem.getAudioInputStream(bufferedIn);

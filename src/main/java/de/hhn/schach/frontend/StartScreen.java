@@ -11,8 +11,7 @@ public class StartScreen extends JFrame {
     private int checkboxNum = 0;
 
     public StartScreen() {
-        super();
-        this.setTitle("Schach");
+        super("Schach");
         this.setLayout(null);
         this.getContentPane().setBackground(new Color(0x312e2b));
         this.setSize(500, 650);

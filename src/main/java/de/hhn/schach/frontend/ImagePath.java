@@ -11,8 +11,8 @@ public final class ImagePath {
     public static Image getResource(String file) {
         Image image = null;
         try {
-            URL resource = ImagePath.class.getResource("/" + file);
-            if(resource == null) throw new Exception("Resource not found: " + file);
+            URL resource = ImagePath.class.getResource("/images/" + file);
+            if (resource == null) throw new Exception("Resource not found: " + file);
             image = ImageIO.read(resource);
         } catch (Exception e) {
             e.printStackTrace();

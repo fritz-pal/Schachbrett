@@ -18,6 +18,7 @@ public class Game {
     private final int whiteElo;
     private final int blackElo;
     private final boolean engineWhite;
+    private final boolean rotatedPieces, rotatedBoard;
     private final UCIProtocol uci;
     private final boolean againstEngine;
     private State state;
@@ -32,8 +33,10 @@ public class Game {
         this.whiteElo = whiteElo;
         this.blackElo = blackElo;
         this.againstEngine = againstEngine;
+        this.rotatedPieces = rotatedPieces;
+        this.rotatedBoard = rotatedBoard;
         mainBoard = new Board(this, fen);
-        window = new Window(this, rotatedPieces, rotatedBoard);
+        window = new Window(this);
         window.setVisible(true);
         window.update(mainBoard, false);
         if (againstEngine) {
@@ -42,8 +45,9 @@ public class Game {
             } else {
                 engineWhite = rotatedBoard;
             }
-            uci = new UCIProtocol(this);
-            state = new TurnAgainstEngineState(this);
+            uci = new UCIProtocol(this, engineWhite);
+            if (engineWhite) state = new EnginePonderState();
+            else state = new TurnAgainstEngineState(this);
         } else {
             engineWhite = false;
             uci = null;
@@ -57,8 +61,9 @@ public class Game {
 
     public void changeState(State state) {
         this.state = state;
-        update(state instanceof PieceSelectedState);
+        update(state instanceof PieceSelectedState || state instanceof PieceSelectedAgainstEngineState);
         if (ended) {
+            this.state = new GameEndedState();
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -114,6 +119,14 @@ public class Game {
 
     public boolean isEngineWhite() {
         return engineWhite;
+    }
+
+    public boolean isRotated(boolean white) {
+        return !white && rotatedPieces && !rotatedBoard || white && rotatedPieces && rotatedBoard;
+    }
+
+    public boolean isRotatedBoard() {
+        return rotatedBoard;
     }
 
     public void foundMove(String notation) {
