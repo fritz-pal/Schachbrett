@@ -294,7 +294,7 @@ public class Board implements Cloneable {
         return false;
     }
 
-    public String getPGN() {
+    public String getPgn() {
         StringBuilder pgn = new StringBuilder("[Event \"?\"]\n");
         pgn.append("[Site \"Schachbrett.jar\"]\n");
         pgn.append("[Date \"").append(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))).append("\"]\n");

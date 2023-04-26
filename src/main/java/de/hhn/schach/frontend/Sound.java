@@ -10,16 +10,14 @@ import java.io.InputStream;
 public class Sound {
     public static void play(Move move) {
         String fileName = "move.wav";
-        if (move.isCapture())
-            fileName = "capture.wav";
-        if (move.isPromotion())
-            fileName = "promotion.wav";
-        if (move.isCastling())
-            fileName = "castling.wav";
-        if (move.isCheck())
-            fileName = "check.wav";
-        if (move.isCheckmate())
+        if (move.isCapture()) fileName = "capture.wav";
+        if (move.isPromotion()) fileName = "promotion.wav";
+        if (move.isCastling()) fileName = "castling.wav";
+        if (move.isCheck()) fileName = "check.wav";
+        if (move.isCheckmate()) {
             fileName = "checkmate.wav";
+            play(new Move(null, null, null, "+", null));
+        }
 
         try {
             InputStream soundStream = Sound.class.getResourceAsStream("/sound/" + fileName);

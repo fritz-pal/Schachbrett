@@ -38,7 +38,7 @@ public class Game {
         mainBoard = new Board(this, fen);
         window = new Window(this);
         window.setVisible(true);
-        window.update(mainBoard, false);
+        window.update(mainBoard);
         if (againstEngine) {
             if (mainBoard.isCustomFen() && (mainBoard.isWhiteTurn() && rotatedBoard || !mainBoard.isWhiteTurn() && !rotatedBoard)) {
                 engineWhite = !rotatedBoard;
@@ -61,13 +61,13 @@ public class Game {
 
     public void changeState(State state) {
         this.state = state;
-        update(state instanceof PieceSelectedState || state instanceof PieceSelectedAgainstEngineState);
+        update();
         if (ended) {
             this.state = new GameEndedState();
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    endScreen = new EndScreen(mainBoard.getResult(), mainBoard.getPGN(), mainBoard.getFen(), Game.this);
+                    endScreen = new EndScreen(Game.this);
                 }
             }, 1000);
         }
@@ -81,8 +81,8 @@ public class Game {
         this.selectedTile = selectedTile;
     }
 
-    public void update(boolean performanceMode) {
-        window.update(mainBoard, performanceMode);
+    public void update() {
+        window.update(mainBoard);
     }
 
     public Window getWindow() {

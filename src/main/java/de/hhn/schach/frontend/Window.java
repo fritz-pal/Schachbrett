@@ -14,14 +14,14 @@ import java.util.List;
 public class Window extends JFrame {
     private final Game game;
     private final List<Tile> tiles = new ArrayList<>();
+    JPanel boardPanel = new JPanel();
+
 
     public Window(Game game) {
         super();
         this.game = game;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.setSize(800, 800);
-        this.getContentPane().setPreferredSize(new Dimension(800, 800));
-        this.pack();
+        this.setSize(816, 839);
         this.setLocationRelativeTo(null);
         this.setLayout(null);
         this.setMinimumSize(new Dimension(416, 439));
@@ -36,42 +36,31 @@ public class Window extends JFrame {
             }
         });
 
-        for (int y = 0; y < 8; y++) {
-            for (int x = 0; x < 8; x++) {
+        boardPanel.setBounds(0, 0, 800, 800);
+        boardPanel.setLayout(new GridLayout(8, 8));
+        this.getContentPane().add(boardPanel);
+
+        for (int x = 7; x >= 0; x--) {
+            for (int y = 0; y < 8; y++) {
                 Vec2 pos = new Vec2(x, y);
                 Tile tile = new Tile(game, pos, this);
                 this.tiles.add(tile);
+                boardPanel.add(tile);
             }
         }
     }
 
-    public void update(Board board, boolean performanceMode) {
+    public void update(Board board) {
         List<Vec2> legalMoves = board.getAllLegalMoves(game.getSelectedTile());
 
-        if (performanceMode) {
-            for (Tile tile : tiles) {
-                tile.setSelected(tile.getPos().equals(game.getSelectedTile()));
-                tile.setLegalMove(legalMoves.contains(tile.getPos()));
-            }
-            return;
-        }
-
         Vec2 checkPos = null;
-        if (board.isInCheck(true)) {
-            checkPos = board.getKingPos(true);
-        } else if (board.isInCheck(false)) {
-            checkPos = board.getKingPos(false);
-        }
+        if (board.isInCheck(true)) checkPos = board.getKingPos(true);
+        else if (board.isInCheck(false)) checkPos = board.getKingPos(false);
         boolean checkmate = board.isCheckmate();
-        if (checkmate) System.out.println(board.getPGN());
 
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();
-            tile.setPiece(board.getPiece(pos));
-            tile.setSelected(pos.equals(game.getSelectedTile()));
-            tile.setLegalMove(legalMoves.contains(pos));
-            tile.setCheck(pos.equals(checkPos));
-            if (checkmate && pos.equals(checkPos)) tile.setCheckmate(true);
+            tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), checkmate && pos.equals(checkPos));
         }
     }
 

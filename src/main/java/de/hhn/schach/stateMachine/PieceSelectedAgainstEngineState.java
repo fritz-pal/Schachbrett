@@ -22,7 +22,7 @@ public class PieceSelectedAgainstEngineState implements State {
         }
         if (board.occupied(pos) && board.getPiece(pos).isWhite() != game.isEngineWhite()) {
             game.setSelectedTile(pos);
-            game.update(true);
+            game.update();
             return;
         }
         if (!board.occupied(pos) || board.getPiece(pos).isWhite() == game.isEngineWhite()) {

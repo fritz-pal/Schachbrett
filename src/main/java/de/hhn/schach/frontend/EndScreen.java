@@ -11,8 +11,11 @@ import java.awt.event.MouseEvent;
 
 public class EndScreen extends JFrame {
 
-    public EndScreen(Result result, String pgn, String fen, Game game) {
+    public EndScreen(Game game) {
         super();
+        Result result = game.getMainBoard().getResult();
+        String fen = game.getMainBoard().getFen();
+        String pgn = game.getMainBoard().getPgn();
         this.setTitle(result.toString());
         this.setLayout(null);
         this.getContentPane().setBackground(new Color(0x312e2b));

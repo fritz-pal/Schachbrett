@@ -5,6 +5,7 @@ import de.hhn.schach.utils.Piece;
 import de.hhn.schach.utils.Vec2;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalButtonUI;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -15,7 +16,6 @@ public class Tile extends JButton {
     private final Vec2 pos;
     private final Game game;
     private final boolean isWhite;
-    private final Point translatedPos;
     Window window;
     private Piece piece = null;
     private boolean mousePressed = false;
@@ -30,12 +30,13 @@ public class Tile extends JButton {
         this.pos = pos;
         this.game = game;
         this.isWhite = (pos.getX() + pos.getY() + 1) % 2 == 0;
-        translatedPos = new Point((!game.isRotatedBoard() ? pos.getY() : (7 - pos.getY())) * tileSize(), (game.isRotatedBoard() ? pos.getX() : (7 - pos.getX())) * tileSize());
-        this.setBounds(translatedPos.x, translatedPos.y, tileSize(), tileSize());
-        this.setContentAreaFilled(false);
         this.setBorderPainted(false);
+        this.setFocusable(false);
+        this.setUI(new MetalButtonUI() {
+            protected void paintButtonPressed(Graphics g, AbstractButton b) {
+            }
+        });
         this.addMouseListener(mouseListener());
-        window.add(this);
     }
 
     private MouseListener mouseListener() {
@@ -43,11 +44,14 @@ public class Tile extends JButton {
             @Override
             public void mouseEntered(MouseEvent e) {
                 hovering = true;
+                setBackGroundColor();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 hovering = false;
+                mousePressed = false;
+                setBackGroundColor();
             }
 
             @Override
@@ -67,98 +71,62 @@ public class Tile extends JButton {
         };
     }
 
-    private int tileSize() {
-        return Math.min(window.getContentPane().getHeight(), window.getContentPane().getWidth()) / 8;
-    }
-
-    private ImageIcon emptyTileImage() {
-        BufferedImage img = new BufferedImage(tileSize(), tileSize(), BufferedImage.TYPE_INT_ARGB);
+    private ImageIcon legalMoveIconImage() {
+        BufferedImage img = new BufferedImage(this.getWidth(), this.getWidth(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D imgGraphics = img.createGraphics();
-        if (check) {
-            imgGraphics.setColor(new Color(0xfa362c));
-            imgGraphics.fillRect(0, 0, tileSize(), tileSize());
-            return new ImageIcon(img);
-        }
-        if (this.mousePressed || this.selected) {
-            imgGraphics.setColor(isWhite ? new Color(0xf7eb58) : new Color(0xdcc431));
-            imgGraphics.fillRect(0, 0, tileSize(), tileSize());
-        } else if (this.hovering) {
-            imgGraphics.setColor(new Color(0xf7, 0xeb, 0x58, 60));
-            imgGraphics.fillRect(0, 0, tileSize(), tileSize());
-        }
-        if (this.legalMoveIcon) {
-            imgGraphics.setColor(new Color(0, 0, 0, 60));
-            if (this.piece == null) {
-                imgGraphics.fillOval(tileSize() / 4, tileSize() / 4, tileSize() / 2, tileSize() / 2);
-            } else {
-                int borderSize = tileSize() / 8;
-                imgGraphics.fillRect(borderSize, 0, tileSize(), borderSize);
-                imgGraphics.fillRect(0, 0, borderSize, tileSize() - borderSize);
-                imgGraphics.fillRect(tileSize() - borderSize, borderSize, borderSize, tileSize());
-                imgGraphics.fillRect(0, tileSize() - borderSize, tileSize() - borderSize, borderSize);
-            }
+        imgGraphics.setColor(new Color(0, 0, 0, 60));
+        if (this.piece == null) {
+            imgGraphics.fillOval(this.getWidth() / 4, this.getWidth() / 4, this.getWidth() / 2, this.getWidth() / 2);
+        } else {
+            int borderSize = this.getWidth() / 8;
+            imgGraphics.fillRect(borderSize, 0, this.getWidth(), borderSize);
+            imgGraphics.fillRect(0, 0, borderSize, this.getWidth() - borderSize);
+            imgGraphics.fillRect(this.getWidth() - borderSize, borderSize, borderSize, this.getWidth());
+            imgGraphics.fillRect(0, this.getWidth() - borderSize, this.getWidth() - borderSize, borderSize);
         }
         return new ImageIcon(img);
-    }
-
-    private void calcPosition() {
-        if (window.getContentPane().getHeight() > window.getContentPane().getWidth()) {
-            translatedPos.x = (!game.isRotatedBoard() ? pos.getY() : (7 - pos.getY())) * tileSize();
-            translatedPos.y = (game.isRotatedBoard() ? pos.getX() : (7 - pos.getX())) * tileSize() + ((window.getContentPane().getHeight() - window.getContentPane().getWidth()) / 2);
-        }
-        if (window.getContentPane().getHeight() < window.getContentPane().getWidth()) {
-            translatedPos.x = (!game.isRotatedBoard() ? pos.getY() : (7 - pos.getY())) * tileSize() + ((window.getContentPane().getWidth() - window.getContentPane().getHeight()) / 2);
-            translatedPos.y = (game.isRotatedBoard() ? pos.getX() : (7 - pos.getX())) * tileSize();
-        }
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        this.setIcon(this.getImg());
-        calcPosition();
-        this.setBounds(translatedPos.x, translatedPos.y, tileSize(), tileSize());
     }
 
     private ImageIcon getImg() {
-        BufferedImage img = new BufferedImage(tileSize(), tileSize(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage img = new BufferedImage(this.getWidth(), this.getWidth(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D imgGraphics = img.createGraphics();
-        imgGraphics.setColor(isWhite ? new Color(0xedd6b0) : new Color(0xb88762));
-        imgGraphics.fillRect(0, 0, tileSize(), tileSize());
-
-        imgGraphics.drawImage(this.emptyTileImage().getImage(), 0, 0, null);
+        if (this.legalMoveIcon) imgGraphics.drawImage(this.legalMoveIconImage().getImage(), 0, 0, null);
         if (piece != null) {
             ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.type(), piece.isWhite(), game.isRotated(piece.isWhite())));
-            imgGraphics.drawImage(pieceImg.getImage(), 0, 0, tileSize(), tileSize(), null);
+            imgGraphics.drawImage(pieceImg.getImage(), 0, 0, this.getWidth(), this.getWidth(), null);
         }
         if (checkmate) {
             ImageIcon checkmateImg = new ImageIcon(ImagePath.getResource("Checkmate.png"));
-            imgGraphics.drawImage(checkmateImg.getImage(), 0, 0, tileSize(), tileSize(), null);
+            imgGraphics.drawImage(checkmateImg.getImage(), 0, 0, this.getWidth(), this.getWidth(), null);
         }
         return new ImageIcon(img);
-    }
-
-    public void setPiece(Piece piece) {
-        this.piece = piece;
     }
 
     public Vec2 getPos() {
         return pos;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
-    public void setLegalMove(boolean legalMoveIcon) {
+    public void update(Piece piece, boolean legalMoveIcon, boolean check, boolean checkmate) {
+        this.piece = piece;
+        this.selected = pos.equals(game.getSelectedTile());
         this.legalMoveIcon = legalMoveIcon;
-    }
-
-    public void setCheck(boolean check) {
         this.check = check;
+        this.checkmate = checkmate;
+        this.setBackGroundColor();
+        this.setIcon(getImg());
     }
 
-    public void setCheckmate(boolean checkmate) {
-        this.checkmate = checkmate;
+    private void setBackGroundColor() {
+        Color color;
+        if (this.check) {
+            color = new Color(0xfa362c);
+        } else if (this.selected) {
+            color = isWhite ? new Color(0xf7eb58) : new Color(0xdcc431);
+        } else if (this.hovering) {
+            color = isWhite ? new Color(0xF0DD8E) : new Color(0xC39960);
+        } else {
+            color = isWhite ? new Color(0xedd6b0) : new Color(0xb88762);
+        }
+        this.setBackground(color);
     }
 }
