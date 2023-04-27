@@ -12,7 +12,6 @@ import java.util.TimerTask;
 
 public class Game {
     private final Board mainBoard;
-    private final Window window;
     private final String whiteName;
     private final String blackName;
     private final int whiteElo;
@@ -21,8 +20,9 @@ public class Game {
     private final boolean rotatedPieces, rotatedBoard;
     private final UCIProtocol uci;
     private final boolean againstEngine;
-    private State state;
     private final int difficulty;
+    private Window window;
+    private State state;
     private Vec2 selectedTile = null;
     private EndScreen endScreen = null;
     private String engineName = "Stockfish";
@@ -37,8 +37,8 @@ public class Game {
         this.rotatedPieces = rotatedPieces;
         this.rotatedBoard = rotatedBoard;
         mainBoard = new Board(this, fen);
-        window = new Window(this);
-        window.update(mainBoard);
+        window = new Window(this, false);
+        window.update();
         if (againstEngine) {
             if (mainBoard.isCustomFen() && (mainBoard.isWhiteTurn() && rotatedBoard || !mainBoard.isWhiteTurn() && !rotatedBoard)) {
                 engineWhite = !rotatedBoard;
@@ -65,7 +65,7 @@ public class Game {
 
     public void changeState(State state) {
         this.state = state;
-        update();
+        window.update();
     }
 
     public Vec2 getSelectedTile() {
@@ -76,12 +76,12 @@ public class Game {
         this.selectedTile = selectedTile;
     }
 
-    public void update() {
-        window.update(mainBoard);
-    }
-
     public Window getWindow() {
         return window;
+    }
+
+    public void setWindow(Window window) {
+        this.window = window;
     }
 
     public int getEngineDifficulty() {
@@ -95,7 +95,7 @@ public class Game {
     public void endGame() {
         selectedTile = null;
         this.state = new GameEndedState();
-        update();
+        window.update();
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {

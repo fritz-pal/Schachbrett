@@ -13,9 +13,11 @@ import javax.swing.plaf.metal.MetalButtonUI;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 
 public class PromotionButton extends JButton {
     public PromotionButton(Game game, boolean white, Vec2 position, PieceType type, PromotionWindow parent) {
+        int width = game.getWindow().getTile(position).getWidth();
         this.setBackground(new Color(!white ? 0xf2f3f5 : 0x312e2b));
         this.setBorderPainted(false);
         this.setFocusable(false);
@@ -23,7 +25,10 @@ public class PromotionButton extends JButton {
             protected void paintButtonPressed(Graphics g, AbstractButton b) {
             }
         });
-        this.setIcon(new ImageIcon(ImagePath.getPieceImage(type, white, game.isRotated(white))));
+        BufferedImage img = new BufferedImage(width, width, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D imgGraphics = img.createGraphics();
+        imgGraphics.drawImage(new ImageIcon(ImagePath.getPieceImage(type, white, game.isRotated(white))).getImage(), 0, 0, width, width, null);
+        this.setIcon(new ImageIcon(img));
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

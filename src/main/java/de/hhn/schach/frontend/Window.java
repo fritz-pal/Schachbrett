@@ -6,20 +6,21 @@ import de.hhn.schach.utils.Vec2;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Window extends JFrame {
     private final Game game;
     private final List<Tile> tiles = new ArrayList<>();
+    private final boolean maximized;
     JPanel boardPanel = new JPanel();
 
 
-    public Window(Game game) {
+    public Window(Game game, boolean maximized) {
         super();
         this.game = game;
+        this.maximized = maximized;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.setSize(816, 839);
         this.setLocationRelativeTo(null);
@@ -29,16 +30,13 @@ public class Window extends JFrame {
         this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
         this.getContentPane().setBackground(new Color(0x312e2b));
         this.setResizable(true);
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent windowEvent) {
-                game.stop();
-            }
-        });
-
-        boardPanel.setBounds(0, 0, 800, 800);
-        boardPanel.setLayout(new GridLayout(8, 8));
-        this.getContentPane().add(boardPanel);
+        this.addWindowListener(windowListener());
+        this.addWindowStateListener(windowStateListener());
+        this.setUndecorated(maximized);
+        this.setExtendedState(maximized ? JFrame.MAXIMIZED_BOTH : JFrame.NORMAL);
+        this.getContentPane().addKeyListener(keyListener());
+        this.getContentPane().setFocusable(true);
+        this.getContentPane().requestFocusInWindow();
 
         for (int x = 7; x >= 0; x--) {
             for (int y = 0; y < 8; y++) {
@@ -48,10 +46,20 @@ public class Window extends JFrame {
                 boardPanel.add(tile);
             }
         }
+
+        if (!maximized)
+            boardPanel.setBounds((this.getWidth() - 16 - getBoardSize()) / 2, (this.getHeight() - 39 - getBoardSize()) / 2, getBoardSize(), getBoardSize());
+        else
+            boardPanel.setBounds((Toolkit.getDefaultToolkit().getScreenSize().width - getBoardSize()) / 2, 0, getBoardSize(), getBoardSize());
+
+        boardPanel.setLayout(new GridLayout(8, 8));
+        this.getContentPane().add(boardPanel);
+
         this.setVisible(true);
     }
 
-    public void update(Board board) {
+    public void update() {
+        Board board = game.getMainBoard();
         List<Vec2> legalMoves = board.getAllLegalMoves(game.getSelectedTile());
 
         Vec2 checkPos = null;
@@ -70,5 +78,56 @@ public class Window extends JFrame {
             if (tile.getPos().equals(pos)) return tile;
         }
         throw new IllegalArgumentException("Tile not found");
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        update();
+        if (!maximized)
+            boardPanel.setBounds((this.getWidth() - 16 - getBoardSize()) / 2, (this.getHeight() - 39 - getBoardSize()) / 2, getBoardSize(), getBoardSize());
+    }
+
+    private int getBoardSize() {
+        return !maximized ? Math.min(this.getWidth() - 16, this.getHeight() - 39) : Toolkit.getDefaultToolkit().getScreenSize().height;
+    }
+
+    private KeyAdapter keyListener() {
+        return new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case 122 -> maximize();
+                    case 27 -> {
+                        game.setSelectedTile(null);
+                        update();
+                    }
+                }
+            }
+        };
+    }
+
+    private WindowStateListener windowStateListener() {
+        return windowEvent -> {
+            if (windowEvent.getNewState() == JFrame.MAXIMIZED_BOTH) {
+                maximize();
+            }
+        };
+    }
+
+    private WindowAdapter windowListener() {
+        return new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                game.stop();
+            }
+        };
+    }
+
+    private void maximize() {
+        Window window = new Window(game, !maximized);
+        game.setWindow(window);
+        window.update();
+        Window.this.dispose();
     }
 }

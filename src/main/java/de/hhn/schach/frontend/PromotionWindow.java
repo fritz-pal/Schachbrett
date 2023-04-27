@@ -15,10 +15,11 @@ import java.awt.event.FocusEvent;
 
 public class PromotionWindow extends JFrame {
     public PromotionWindow(Game game, boolean white, Vec2 position) {
-        this.setSize(100, 400);
+        Tile tile = game.getWindow().getTile(position);
+        this.setSize(tile.getWidth(), tile.getWidth() * 4);
         this.setResizable(false);
         this.setUndecorated(true);
-        this.setLocationRelativeTo(game.getWindow().getTile(position));
+        this.setLocationRelativeTo(tile);
         this.setAlwaysOnTop(true);
         this.setLayout(new GridLayout(4, 1));
         this.addFocusListener(new FocusAdapter() {
