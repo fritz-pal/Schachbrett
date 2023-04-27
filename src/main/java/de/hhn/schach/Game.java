@@ -23,7 +23,6 @@ public class Game {
     private final boolean againstEngine;
     private State state;
     private Vec2 selectedTile = null;
-    private boolean ended = false;
     private EndScreen endScreen = null;
     private String engineName = "Stockfish";
 
@@ -62,15 +61,6 @@ public class Game {
     public void changeState(State state) {
         this.state = state;
         update();
-        if (ended) {
-            this.state = new GameEndedState();
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    endScreen = new EndScreen(Game.this);
-                }
-            }, 1000);
-        }
     }
 
     public Vec2 getSelectedTile() {
@@ -94,7 +84,15 @@ public class Game {
     }
 
     public void endGame() {
-        this.ended = true;
+        selectedTile = null;
+        this.state = new GameEndedState();
+        update();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                endScreen = new EndScreen(Game.this);
+            }
+        }, 1000);
     }
 
     public String getEngineName() {
@@ -125,17 +123,17 @@ public class Game {
         return !white && rotatedPieces && !rotatedBoard || white && rotatedPieces && rotatedBoard;
     }
 
-    public boolean isRotatedBoard() {
-        return rotatedBoard;
-    }
-
     public void foundMove(String notation) {
         uci.printInfo();
+        if (notation.equals("0000")) return;
         Vec2 from = new Vec2(notation.substring(0, 2));
         Vec2 to = new Vec2(notation.substring(2, 4));
         mainBoard.move(from, to, true, notation.length() > 4 ? PieceType.fromNotation(notation.charAt(4)) : null);
-        if (mainBoard.isCheckmate() || mainBoard.isStalemate()) endGame();
-        changeState(new TurnAgainstEngineState(this));
+        if (mainBoard.isCheckmate() || mainBoard.isStalemate()) {
+            endGame();
+        } else {
+            changeState(new TurnAgainstEngineState(this));
+        }
     }
 
     public void startEngine() {

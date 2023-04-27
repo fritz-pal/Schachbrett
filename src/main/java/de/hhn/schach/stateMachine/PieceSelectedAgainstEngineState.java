@@ -32,7 +32,10 @@ public class PieceSelectedAgainstEngineState implements State {
                     return;
                 }
                 board.move(game.getSelectedTile(), pos, true, null);
-                if (board.isCheckmate() || board.isStalemate()) game.endGame();
+                if (board.isCheckmate() || board.isStalemate()) {
+                    game.endGame();
+                    return;
+                }
                 game.startEngine();
             } else {
                 game.setSelectedTile(null);

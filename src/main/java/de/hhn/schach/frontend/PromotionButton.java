@@ -9,6 +9,7 @@ import de.hhn.schach.utils.PieceType;
 import de.hhn.schach.utils.Vec2;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalButtonUI;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -17,20 +18,26 @@ public class PromotionButton extends JButton {
     public PromotionButton(Game game, boolean white, Vec2 position, PieceType type, PromotionWindow parent) {
         this.setBackground(new Color(!white ? 0xf2f3f5 : 0x312e2b));
         this.setBorderPainted(false);
-        this.setFocusPainted(false);
         this.setFocusable(false);
+        this.setUI(new MetalButtonUI() {
+            protected void paintButtonPressed(Graphics g, AbstractButton b) {
+            }
+        });
         this.setIcon(new ImageIcon(ImagePath.getPieceImage(type, white, game.isRotated(white))));
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Board board = game.getMainBoard();
                 board.move(game.getSelectedTile(), position, true, type);
-                if (board.isCheckmate() || board.isStalemate()) game.endGame();
-                game.setSelectedTile(null);
-                if (game.getState() instanceof PieceSelectedState) {
-                    game.changeState(new TurnState(game));
-                } else if (game.getState() instanceof PieceSelectedAgainstEngineState) {
-                    game.startEngine();
+                if (board.isCheckmate() || board.isStalemate()) {
+                    game.endGame();
+                } else {
+                    game.setSelectedTile(null);
+                    if (game.getState() instanceof PieceSelectedState) {
+                        game.changeState(new TurnState(game));
+                    } else if (game.getState() instanceof PieceSelectedAgainstEngineState) {
+                        game.startEngine();
+                    }
                 }
                 parent.dispose();
             }
