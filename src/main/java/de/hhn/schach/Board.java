@@ -300,14 +300,14 @@ public class Board implements Cloneable {
         pgn.append("[Date \"").append(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))).append("\"]\n");
         if (game.isAgainstEngine() && game.isEngineWhite()) {
             pgn.append("[White \"").append(game.getEngineName()).append("\"]\n");
-            pgn.append("[WhiteElo \"1350\"]\n");
+            pgn.append("[WhiteElo \"").append(Game.map(game.getEngineDifficulty())).append("\"]\n");
         } else {
             pgn.append("[White \"").append(game.getName(true).isBlank() ? "?" : game.getName(true)).append("\"]\n");
             pgn.append("[WhiteElo \"").append(game.getElo(true) == -1 ? "?" : game.getElo(true)).append("\"]\n");
         }
         if (game.isAgainstEngine() && !game.isEngineWhite()) {
             pgn.append("[Black \"").append(game.getEngineName()).append("\"]\n");
-            pgn.append("[BlackElo \"1350\"]\n");
+            pgn.append("[BlackElo \"").append(Game.map(game.getEngineDifficulty())).append("\"]\n");
         } else {
             pgn.append("[Black \"").append(game.getName(false).isBlank() ? "?" : game.getName(false)).append("\"]\n");
             pgn.append("[BlackElo \"").append(game.getElo(false) == -1 ? "?" : game.getElo(false)).append("\"]\n");

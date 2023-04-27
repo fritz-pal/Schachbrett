@@ -54,7 +54,7 @@ public class UCIProtocol {
     public void receiveCommand(String command, String[] params) {
         switch (command) {
             case "uciok" -> {
-                sendCommand("setoption name Skill Level value 0");
+                sendCommand("setoption name Skill Level value " + game.getEngineDifficulty());
                 sendCommand("isready");
             }
             case "readyok" -> {

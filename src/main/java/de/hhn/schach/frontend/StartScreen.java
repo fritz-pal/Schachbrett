@@ -28,9 +28,30 @@ public class StartScreen extends JFrame {
         titleLabel.setForeground(Color.WHITE);
         this.getContentPane().add(titleLabel, 0);
 
+        JLabel difficultyLabel = new JLabel("Difficulty: 1350");
+        difficultyLabel.setBounds(250, 300, 200, 50);
+        difficultyLabel.setFont(new Font("Arial Black", Font.PLAIN, 14));
+        difficultyLabel.setForeground(Color.WHITE);
+        difficultyLabel.setHorizontalAlignment(JLabel.CENTER);
+        difficultyLabel.setVisible(false);
+        this.getContentPane().add(difficultyLabel, 1);
+
+        JSlider difficultySlider = new JSlider(JSlider.HORIZONTAL, 0, 20, 0);
+        difficultySlider.setBounds(250, 300, 200, 20);
+        difficultySlider.setBackground(new Color(0x312e2b));
+        difficultySlider.addChangeListener(e -> {
+            difficultyLabel.setText("Difficulty: " + Game.map(difficultySlider.getValue()));
+        });
+        difficultySlider.setVisible(false);
+        this.getContentPane().add(difficultySlider, 0);
+
         JCheckBox rotatedPieces = makeCheckbox("Rotated pieces");
         JCheckBox rotatedBoard = makeCheckbox("Rotated board");
         JCheckBox singlePlayer = makeCheckbox("Singleplayer");
+        singlePlayer.addActionListener(e -> {
+            difficultySlider.setVisible(singlePlayer.isSelected());
+            difficultyLabel.setVisible(singlePlayer.isSelected());
+        });
 
         JTextField fenInput = new JTextField("");
         fenInput.setToolTipText("Custom Position (Fen)");
@@ -126,7 +147,8 @@ public class StartScreen extends JFrame {
                             whitePlayerName.getText(),
                             blackPlayerName.getText(),
                             whiteElo.getText().equals("") ? -1 : Integer.parseInt(whiteElo.getText()),
-                            blackElo.getText().equals("") ? -1 : Integer.parseInt(blackElo.getText()));
+                            blackElo.getText().equals("") ? -1 : Integer.parseInt(blackElo.getText()),
+                            singlePlayer.isSelected() ? difficultySlider.getValue() : -1);
                 } else {
                     errorLabel.setText("Invalid FEN!");
                 }

@@ -48,6 +48,7 @@ public class Window extends JFrame {
                 boardPanel.add(tile);
             }
         }
+        this.setVisible(true);
     }
 
     public void update(Board board) {

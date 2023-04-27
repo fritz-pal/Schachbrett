@@ -22,13 +22,15 @@ public class Game {
     private final UCIProtocol uci;
     private final boolean againstEngine;
     private State state;
+    private final int difficulty;
     private Vec2 selectedTile = null;
     private EndScreen endScreen = null;
     private String engineName = "Stockfish";
 
-    public Game(boolean rotatedPieces, boolean rotatedBoard, boolean againstEngine, String fen, String whiteName, String blackName, int whiteElo, int blackElo) {
+    public Game(boolean rotatedPieces, boolean rotatedBoard, boolean againstEngine, String fen, String whiteName, String blackName, int whiteElo, int blackElo, int difficulty) {
         this.whiteName = whiteName;
         this.blackName = blackName;
+        this.difficulty = difficulty;
         this.whiteElo = whiteElo;
         this.blackElo = blackElo;
         this.againstEngine = againstEngine;
@@ -36,7 +38,6 @@ public class Game {
         this.rotatedBoard = rotatedBoard;
         mainBoard = new Board(this, fen);
         window = new Window(this);
-        window.setVisible(true);
         window.update(mainBoard);
         if (againstEngine) {
             if (mainBoard.isCustomFen() && (mainBoard.isWhiteTurn() && rotatedBoard || !mainBoard.isWhiteTurn() && !rotatedBoard)) {
@@ -52,6 +53,10 @@ public class Game {
             uci = null;
             state = new TurnState(this);
         }
+    }
+
+    public static int map(int difficulty) {
+        return difficulty * 75 + 1350;
     }
 
     public State getState() {
@@ -77,6 +82,10 @@ public class Game {
 
     public Window getWindow() {
         return window;
+    }
+
+    public int getEngineDifficulty() {
+        return difficulty;
     }
 
     public Board getMainBoard() {
@@ -124,8 +133,8 @@ public class Game {
     }
 
     public void foundMove(String notation) {
-        uci.printInfo();
         if (notation.equals("0000")) return;
+        uci.printInfo();
         Vec2 from = new Vec2(notation.substring(0, 2));
         Vec2 to = new Vec2(notation.substring(2, 4));
         mainBoard.move(from, to, true, notation.length() > 4 ? PieceType.fromNotation(notation.charAt(4)) : null);
