@@ -33,7 +33,10 @@ public class PieceSelectedState implements State {
                     return;
                 }
                 board.move(game.getSelectedTile(), pos, true, null);
-                if (board.isCheckmate() || board.isStalemate()) game.endGame();
+                if (board.isCheckmate() || board.isStalemate()) {
+                    game.endGame();
+                    return;
+                }
             }
             game.setSelectedTile(null);
             game.changeState(new TurnState(game));
