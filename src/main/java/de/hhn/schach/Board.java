@@ -522,7 +522,7 @@ public class Board implements Cloneable {
         if (piece == null)
             throw new IllegalArgumentException("Illegal move: " + from.getName() + to.getName() + " (no piece at " + from.getName() + ")");
 
-        String notation = piece.type().getNotation() + (occupied(to) || to.equals(enCroissant) ? "x" : "") + to.getName();
+        String notation = piece.type().getNotation() + (occupied(to) || (to.equals(enCroissant) && piece.type() == PieceType.PAWN) ? "x" : "") + to.getName();
         if (isMainBoard) {
             if (notation.startsWith("P")) {
                 notation = notation.substring(1);
@@ -609,20 +609,51 @@ public class Board implements Cloneable {
                 else notation += "+";
             }
 
-            if (!piece.isWhite()) moveNumber++;
 
             String fen = getShortFen();
             Move move = new Move(from, to, piece, notation, promotion, fen);
             moveHistory.add(move);
 
-            int repetition = 0;
-            for (Move m : moveHistory) {
-                if (m.fen().equals(fen)) repetition++;
-            }
-            if (repetition >= 3) result = Result.DRAWBYTHREEFOLDREPETITION;
-
+            if (isInsufficientMaterial()) result = Result.DRAWBYINSUFFICIENTMATERIAL;
+            checkIfRepetition(fen);
+            if (!piece.isWhite()) moveNumber++;
             Sound.moveSound(move);
         }
+    }
+
+    private boolean isInsufficientMaterial() {
+        if (pieces.size() <= 2) return true;
+        int numBishopsWhite = 0;
+        int numKnightsWhite = 0;
+        int numBishopsBlack = 0;
+        int numKnightsBlack = 0;
+        for (Piece piece : pieces.values()) {
+            switch (piece.type()) {
+                case PAWN, ROOK, QUEEN -> {
+                    return false;
+                }
+                case BISHOP -> {
+                    if (piece.isWhite()) numBishopsWhite++;
+                    else numBishopsBlack++;
+                }
+                case KNIGHT -> {
+                    if (piece.isWhite()) numKnightsWhite++;
+                    else numKnightsBlack++;
+                }
+            }
+        }
+        if (numBishopsWhite >= 2 || numBishopsBlack >= 2) return false;
+        if (numKnightsBlack > 2 || numKnightsWhite > 2) return false;
+        if (numBishopsWhite == 1 && numKnightsWhite == 1) return false;
+        return numBishopsBlack != 1 || numKnightsBlack != 1;
+    }
+
+    private void checkIfRepetition(String fen) {
+        int repetition = 0;
+        for (Move m : moveHistory) {
+            if (m.fen().equals(fen)) repetition++;
+        }
+        if (repetition >= 3) result = Result.DRAWBYTHREEFOLDREPETITION;
     }
 
     public Vec2 getKingPos(boolean white) {

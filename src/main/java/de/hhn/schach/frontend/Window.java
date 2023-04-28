@@ -63,8 +63,8 @@ public class Window extends JFrame {
         List<Vec2> legalMoves = board.getAllLegalMoves(game.getSelectedTile());
 
         Vec2 checkPos = null;
-        if (board.isInCheck(true)) checkPos = board.getKingPos(true);
-        else if (board.isInCheck(false)) checkPos = board.getKingPos(false);
+        if (board.isWhiteTurn() && board.isInCheck(true)) checkPos = board.getKingPos(true);
+        else if (!board.isWhiteTurn() && board.isInCheck(false)) checkPos = board.getKingPos(false);
         boolean checkmate = board.isCheckmate();
 
         for (Tile tile : tiles) {
