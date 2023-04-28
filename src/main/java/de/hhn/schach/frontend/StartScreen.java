@@ -14,8 +14,8 @@ public class StartScreen extends JFrame {
         super("Chess");
         this.setLayout(null);
         this.getContentPane().setBackground(new Color(0x312e2b));
-        this.setSize(500, 650);
-        this.setPreferredSize(new Dimension(500, 650));
+        this.setSize(500, 600);
+        this.getContentPane().setPreferredSize(new Dimension(500, 600));
         this.pack();
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,6 +28,10 @@ public class StartScreen extends JFrame {
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
         this.getContentPane().add(titleLabel, 0);
+
+        JLabel imageLabel = new JLabel(new ImageIcon(ImagePath.getResource("thumbnail.png")));
+        imageLabel.setBounds(100, 75, 300, 225);
+        this.add(imageLabel);
 
         JLabel difficultyLabel = new JLabel("Difficulty: 1350");
         difficultyLabel.setBounds(250, 300, 200, 50);
@@ -151,7 +155,7 @@ public class StartScreen extends JFrame {
                 } else {
                     errorLabel.setText("Invalid FEN!");
                 }
-            } catch (Exception exception) {
+            } catch (NumberFormatException exception) {
                 errorLabel.setText("Invalid Elo!");
             }
         });
@@ -170,11 +174,5 @@ public class StartScreen extends JFrame {
         this.getContentPane().add(checkbox, 0);
         checkboxNum++;
         return checkbox;
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        g.drawImage(new ImageIcon(ImagePath.getResource("thumbnail.png")).getImage(), 100, 100, 300, 225, null);
     }
 }

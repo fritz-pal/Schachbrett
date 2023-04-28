@@ -687,6 +687,15 @@ public class Board implements Cloneable {
         return new Board(game, pieces, whiteTurn, enCroissant, whiteCastleQ, whiteCastleK, blackCastleQ, blackCastleK);
     }
 
+    public void resign() {
+        result = whiteTurn ? Result.BLACKWONBYRESIGNATION : Result.WHITEWONBYRESIGNATION;
+        game.endGame();
+    }
+
+    public void offerDraw() {
+        //TODO
+    }
+
     public Result getResult() {
         return result;
     }

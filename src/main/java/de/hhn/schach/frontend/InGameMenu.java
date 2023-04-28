@@ -32,7 +32,7 @@ public class InGameMenu extends JFrame {
         resignButton.setBackground(new Color(0x514e4b));
         resignButton.setForeground(Color.WHITE);
         resignButton.setFocusable(false);
-//        resignButton.addActionListener(e -> game.getMainBoard().resign());
+        resignButton.addActionListener(e -> game.getMainBoard().resign());
         this.add(resignButton);
 
         JButton drawButton = new JButton("Offer/Accept Draw");
@@ -41,7 +41,7 @@ public class InGameMenu extends JFrame {
         drawButton.setBackground(new Color(0x514e4b));
         drawButton.setForeground(Color.WHITE);
         drawButton.setFocusable(false);
-//        drawButton.addActionListener(e -> game.getMainBoard().offerDraw());
+        drawButton.addActionListener(e -> game.getMainBoard().offerDraw());
         this.add(drawButton);
 
         JButton infoButton = new JButton("Info");

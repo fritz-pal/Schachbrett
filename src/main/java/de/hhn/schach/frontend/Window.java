@@ -23,10 +23,10 @@ public class Window extends JFrame {
         this.game = game;
         this.maximized = maximized;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.setSize(816, 839);
+        this.setSize(800, 800);
         this.setLocationRelativeTo(null);
         this.setLayout(null);
-        this.setMinimumSize(new Dimension(416, 439));
+        this.getContentPane().setMinimumSize(new Dimension(400, 400));
         this.setTitle("Chess");
         this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
         this.getContentPane().setBackground(new Color(0x312e2b));
@@ -38,6 +38,8 @@ public class Window extends JFrame {
         this.getContentPane().addKeyListener(keyListener());
         this.getContentPane().setFocusable(true);
         this.getContentPane().requestFocusInWindow();
+        this.getContentPane().setPreferredSize(new Dimension(800, 800));
+        this.pack();
 
         for (int x = 7; x >= 0; x--) {
             for (int y = 0; y < 8; y++) {
@@ -49,7 +51,7 @@ public class Window extends JFrame {
         }
 
         if (!maximized)
-            boardPanel.setBounds((this.getWidth() - 16 - getBoardSize()) / 2, (this.getHeight() - 39 - getBoardSize()) / 2, getBoardSize(), getBoardSize());
+            boardPanel.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2, (this.getContentPane().getHeight() - getBoardSize()) / 2, getBoardSize(), getBoardSize());
         else
             boardPanel.setBounds((Toolkit.getDefaultToolkit().getScreenSize().width - getBoardSize()) / 2, 0, getBoardSize(), getBoardSize());
 
@@ -120,13 +122,13 @@ public class Window extends JFrame {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        update();
         if (!maximized)
-            boardPanel.setBounds((this.getWidth() - 16 - getBoardSize()) / 2, (this.getHeight() - 39 - getBoardSize()) / 2, getBoardSize(), getBoardSize());
+            boardPanel.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2, (this.getContentPane().getHeight() - getBoardSize()) / 2, getBoardSize(), getBoardSize());
+        update();
     }
 
     private int getBoardSize() {
-        return !maximized ? Math.min(this.getWidth() - 16, this.getHeight() - 39) : Toolkit.getDefaultToolkit().getScreenSize().height;
+        return !maximized ? Math.min(this.getContentPane().getWidth(), this.getContentPane().getHeight()) : Toolkit.getDefaultToolkit().getScreenSize().height;
     }
 
     private KeyAdapter keyListener() {

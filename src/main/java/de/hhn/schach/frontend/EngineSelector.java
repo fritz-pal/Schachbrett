@@ -12,7 +12,10 @@ public class EngineSelector extends JFrame {
     public EngineSelector(JFrame parent) {
         super("Engine Selector");
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setSize(616, 140);
+        this.setSize(600, 100);
+        this.setResizable(false);
+        this.getContentPane().setPreferredSize(new Dimension(600, 100));
+        this.pack();
         this.setLayout(null);
         this.setLocationRelativeTo(parent);
         this.getContentPane().setBackground(new Color(0x312e2b));

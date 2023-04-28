@@ -19,7 +19,9 @@ public class EndScreen extends JFrame {
         this.setTitle(result.toString());
         this.setLayout(null);
         this.getContentPane().setBackground(new Color(0x312e2b));
-        this.setSize(416, 589);
+        this.setSize(400, 550);
+        this.getContentPane().setPreferredSize(new Dimension(400, 550));
+        this.pack();
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLocationRelativeTo(game.getWindow());
