@@ -11,7 +11,7 @@ public class StartScreen extends JFrame {
     private int checkboxNum = 0;
 
     public StartScreen() {
-        super("Schach");
+        super("Chess");
         this.setLayout(null);
         this.getContentPane().setBackground(new Color(0x312e2b));
         this.setSize(500, 650);
@@ -22,10 +22,11 @@ public class StartScreen extends JFrame {
         this.setLocationRelativeTo(null);
         this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
 
-        JLabel titleLabel = new JLabel("Schach");
+        JLabel titleLabel = new JLabel("Chess");
         titleLabel.setBounds(200, 10, 100, 50);
         titleLabel.setFont(new Font("Arial Black", Font.PLAIN, 24));
         titleLabel.setForeground(Color.WHITE);
+        titleLabel.setHorizontalAlignment(JLabel.CENTER);
         this.getContentPane().add(titleLabel, 0);
 
         JLabel difficultyLabel = new JLabel("Difficulty: 1350");
@@ -39,9 +40,7 @@ public class StartScreen extends JFrame {
         JSlider difficultySlider = new JSlider(JSlider.HORIZONTAL, 0, 20, 0);
         difficultySlider.setBounds(250, 300, 200, 20);
         difficultySlider.setBackground(new Color(0x312e2b));
-        difficultySlider.addChangeListener(e -> {
-            difficultyLabel.setText("Difficulty: " + Game.map(difficultySlider.getValue()));
-        });
+        difficultySlider.addChangeListener(e -> difficultyLabel.setText("Difficulty: " + Game.map(difficultySlider.getValue())));
         difficultySlider.setVisible(false);
         this.getContentPane().add(difficultySlider, 0);
 

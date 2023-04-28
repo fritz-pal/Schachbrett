@@ -1,0 +1,70 @@
+package de.hhn.schach.frontend;
+
+import de.hhn.schach.Game;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+
+public class InGameMenu extends JFrame {
+
+    public InGameMenu(Game game) {
+        this.setTitle("Menu");
+        this.setSize(400, 400);
+        this.setUndecorated(true);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setLayout(null);
+        this.setLocationRelativeTo(game.getWindow().getContentPane());
+        this.setResizable(false);
+        this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
+        this.getContentPane().setBackground(new Color(0x312e2b));
+        this.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                InGameMenu.this.dispose();
+            }
+        });
+
+        JButton resignButton = new JButton("Resign");
+        resignButton.setBounds(50, 50, 300, 50);
+        resignButton.setFont(new Font("Arial Black", Font.PLAIN, 24));
+        resignButton.setBackground(new Color(0x514e4b));
+        resignButton.setForeground(Color.WHITE);
+        resignButton.setFocusable(false);
+//        resignButton.addActionListener(e -> game.getMainBoard().resign());
+        this.add(resignButton);
+
+        JButton drawButton = new JButton("Offer/Accept Draw");
+        drawButton.setBounds(50, 125, 300, 50);
+        drawButton.setFont(new Font("Arial Black", Font.PLAIN, 24));
+        drawButton.setBackground(new Color(0x514e4b));
+        drawButton.setForeground(Color.WHITE);
+        drawButton.setFocusable(false);
+//        drawButton.addActionListener(e -> game.getMainBoard().offerDraw());
+        this.add(drawButton);
+
+        JButton infoButton = new JButton("Info");
+        infoButton.setBounds(50, 200, 300, 50);
+        infoButton.setFont(new Font("Arial Black", Font.PLAIN, 24));
+        infoButton.setBackground(new Color(0x514e4b));
+        infoButton.setForeground(Color.WHITE);
+        infoButton.setFocusable(false);
+        infoButton.addActionListener(e -> new EndScreen(game));
+        this.add(infoButton);
+
+        JButton exitButton = new JButton("Exit");
+        exitButton.setBounds(50, 275, 300, 50);
+        exitButton.setFont(new Font("Arial Black", Font.PLAIN, 24));
+        exitButton.setBackground(new Color(0x514e4b));
+        exitButton.setForeground(Color.WHITE);
+        exitButton.setFocusable(false);
+        exitButton.addActionListener(e -> {
+            game.stop();
+            this.dispose();
+        });
+        this.add(exitButton);
+
+        this.setVisible(true);
+    }
+}

@@ -1,16 +1,22 @@
 package de.hhn.schach.utils;
 
 public enum Result {
-    WHITEWONBYCHECKMATE,
-    BLACKWONBYCHECKMATE,
-    BLACKWONBYRESIGNATION,
-    WHITEWONBYRESIGNATION,
-    DRAWBYSTALEMATE,
-    DRAWBYFIFTYMOVESRULE,
-    DRAWBYTHREEFOLDREPETITION,
-    DRAWBYINSUFFICIENTMATERIAL,
-    DRAWBYAGREEMENT,
-    NOTFINISHED;
+    WHITEWONBYCHECKMATE("1-0"),
+    BLACKWONBYCHECKMATE("0-1"),
+    BLACKWONBYRESIGNATION("0-1"),
+    WHITEWONBYRESIGNATION("1-0"),
+    DRAWBYSTALEMATE("1/2-1/2"),
+    DRAWBYFIFTYMOVESRULE("1/2-1/2"),
+    DRAWBYTHREEFOLDREPETITION("1/2-1/2"),
+    DRAWBYINSUFFICIENTMATERIAL("1/2-1/2"),
+    DRAWBYAGREEMENT("1/2-1/2"),
+    NOTFINISHED("*");
+
+    private final String notation;
+
+    Result(String notation) {
+        this.notation = notation;
+    }
 
     @Override
     public String toString() {
@@ -41,12 +47,6 @@ public enum Result {
     }
 
     public String getNotation() {
-        return switch (this) {
-            case WHITEWONBYCHECKMATE, WHITEWONBYRESIGNATION -> "1-0";
-            case BLACKWONBYCHECKMATE, BLACKWONBYRESIGNATION -> "0-1";
-            case DRAWBYSTALEMATE, DRAWBYFIFTYMOVESRULE, DRAWBYTHREEFOLDREPETITION, DRAWBYINSUFFICIENTMATERIAL, DRAWBYAGREEMENT ->
-                    "1/2-1/2";
-            case NOTFINISHED -> "*";
-        };
+        return notation;
     }
 }

@@ -27,7 +27,7 @@ public class Window extends JFrame {
         this.setLocationRelativeTo(null);
         this.setLayout(null);
         this.setMinimumSize(new Dimension(416, 439));
-        this.setTitle("Schach");
+        this.setTitle("Chess");
         this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
         this.getContentPane().setBackground(new Color(0x312e2b));
         this.setResizable(true);
@@ -135,6 +135,9 @@ public class Window extends JFrame {
             public void keyPressed(KeyEvent e) {
                 if (System.currentTimeMillis() - lastKeyPress < 50) return;
                 switch (e.getKeyCode()) {
+                    case 32 -> {
+                        new InGameMenu(game);
+                    }
                     case 37 -> {
                         List<Move> moves = game.getMainBoard().getMoveHistory();
                         if (moves.size() - goBack > 0) {
