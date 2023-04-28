@@ -99,7 +99,7 @@ public class Board implements Cloneable {
         return true;
     }
 
-    public String getFen() {
+    private String getShortFen() {
         StringBuilder fen = new StringBuilder();
         for (int i = 0; i < 8; i++) {
             int empty = 0;
@@ -122,6 +122,12 @@ public class Board implements Cloneable {
                 fen.append("/");
             }
         }
+        return fen.toString();
+    }
+
+    public String getFen() {
+        StringBuilder fen = new StringBuilder();
+        fen.append(getShortFen());
         fen.append(" ");
         fen.append(whiteTurn ? "w" : "b");
         fen.append(" ");
@@ -530,6 +536,10 @@ public class Board implements Cloneable {
             }
         }
 
+        if (occupied(to) || piece.type().equals(PieceType.PAWN)) movesWithoutCaptureOrPawnMove = 0;
+        else movesWithoutCaptureOrPawnMove++;
+        if (movesWithoutCaptureOrPawnMove >= 100) result = Result.DRAWBYFIFTYMOVESRULE;
+
         if (piece.type().equals(PieceType.PAWN)) {
             if ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())) {
                 if (promotion != null) {
@@ -599,13 +609,19 @@ public class Board implements Cloneable {
                 else notation += "+";
             }
 
-            if (occupied(to) || piece.type().equals(PieceType.PAWN)) movesWithoutCaptureOrPawnMove = 0;
-            else movesWithoutCaptureOrPawnMove++;
             if (!piece.isWhite()) moveNumber++;
 
-            Move move = new Move(from, to, piece, notation, promotion);
+            String fen = getShortFen();
+            Move move = new Move(from, to, piece, notation, promotion, fen);
             moveHistory.add(move);
-            Sound.play(move);
+
+            int repetition = 0;
+            for (Move m : moveHistory) {
+                if (m.fen().equals(fen)) repetition++;
+            }
+            if (repetition >= 3) result = Result.DRAWBYTHREEFOLDREPETITION;
+
+            Sound.moveSound(move);
         }
     }
 

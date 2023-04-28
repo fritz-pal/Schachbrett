@@ -1,16 +1,12 @@
 package de.hhn.schach.utils;
 
-public record Move(Vec2 from, Vec2 to, Piece piece, String notation, PieceType promotionType) {
+public record Move(Vec2 from, Vec2 to, Piece piece, String notation, PieceType promotionType, String fen) {
     public boolean isCapture() {
         return notation.contains("x");
     }
 
     public boolean isCheck() {
         return notation.contains("+") || notation.contains("#");
-    }
-
-    public boolean isCheckmate() {
-        return notation.contains("#");
     }
 
     public boolean isPromotion() {

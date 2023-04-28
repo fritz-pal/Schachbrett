@@ -2,9 +2,11 @@ package de.hhn.schach;
 
 import de.hhn.schach.engine.UCIProtocol;
 import de.hhn.schach.frontend.EndScreen;
+import de.hhn.schach.frontend.Sound;
 import de.hhn.schach.frontend.Window;
 import de.hhn.schach.stateMachine.*;
 import de.hhn.schach.utils.PieceType;
+import de.hhn.schach.utils.Result;
 import de.hhn.schach.utils.Vec2;
 
 import java.util.Timer;
@@ -93,6 +95,7 @@ public class Game {
     }
 
     public void endGame() {
+        Sound.endSound();
         selectedTile = null;
         this.state = new GameEndedState();
         window.update();
@@ -138,7 +141,7 @@ public class Game {
         Vec2 from = new Vec2(notation.substring(0, 2));
         Vec2 to = new Vec2(notation.substring(2, 4));
         mainBoard.move(from, to, true, notation.length() > 4 ? PieceType.fromNotation(notation.charAt(4)) : null);
-        if (mainBoard.isCheckmate() || mainBoard.isStalemate()) {
+        if (mainBoard.getResult() != Result.NOTFINISHED) {
             endGame();
         } else {
             changeState(new TurnAgainstEngineState(this));

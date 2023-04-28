@@ -3,6 +3,7 @@ package de.hhn.schach.stateMachine;
 import de.hhn.schach.Board;
 import de.hhn.schach.Game;
 import de.hhn.schach.frontend.PromotionWindow;
+import de.hhn.schach.utils.Result;
 import de.hhn.schach.utils.Vec2;
 
 public class PieceSelectedState implements State {
@@ -33,7 +34,7 @@ public class PieceSelectedState implements State {
                     return;
                 }
                 board.move(game.getSelectedTile(), pos, true, null);
-                if (board.isCheckmate() || board.isStalemate()) {
+                if (board.getResult() != Result.NOTFINISHED) {
                     game.endGame();
                     return;
                 }

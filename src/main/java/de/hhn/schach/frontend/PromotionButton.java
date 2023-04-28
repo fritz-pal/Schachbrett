@@ -6,6 +6,7 @@ import de.hhn.schach.stateMachine.PieceSelectedAgainstEngineState;
 import de.hhn.schach.stateMachine.PieceSelectedState;
 import de.hhn.schach.stateMachine.TurnState;
 import de.hhn.schach.utils.PieceType;
+import de.hhn.schach.utils.Result;
 import de.hhn.schach.utils.Vec2;
 
 import javax.swing.*;
@@ -34,7 +35,7 @@ public class PromotionButton extends JButton {
             public void mouseClicked(MouseEvent e) {
                 Board board = game.getMainBoard();
                 board.move(game.getSelectedTile(), position, true, type);
-                if (board.isCheckmate() || board.isStalemate()) {
+                if (board.getResult() != Result.NOTFINISHED) {
                     game.endGame();
                 } else {
                     game.setSelectedTile(null);
