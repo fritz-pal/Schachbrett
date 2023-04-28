@@ -30,20 +30,9 @@ public class Board implements Cloneable {
         if (!isValidFen(fen)) fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         if (!fen.equals("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")) fromFen = fen;
         String[] fenParts = fen.split(" ");
-        String[] fenRows = fenParts[0].split("/");
-        for (int i = 0; i < 8; i++) {
-            String fenRow = fenRows[i];
-            int j = 0;
-            for (int k = 0; k < fenRow.length(); k++) {
-                char c = fenRow.charAt(k);
-                if (Character.isDigit(c)) {
-                    j += Character.getNumericValue(c);
-                } else {
-                    pieces.put(new Vec2(7 - i, j), new Piece(PieceType.fromNotation(Character.toUpperCase(c)), Character.isUpperCase(c)));
-                    j++;
-                }
-            }
-        }
+
+        fillPieces(fenParts[0]);
+
         whiteTurn = fenParts[1].equals("w");
 
         whiteCastleQ = fenParts[2].contains("Q");
@@ -95,6 +84,23 @@ public class Board implements Cloneable {
             return false;
         }
         return true;
+    }
+
+    private void fillPieces(String shortFen) {
+        String[] fenRows = shortFen.split("/");
+        for (int i = 0; i < 8; i++) {
+            String fenRow = fenRows[i];
+            int j = 0;
+            for (int k = 0; k < fenRow.length(); k++) {
+                char c = fenRow.charAt(k);
+                if (Character.isDigit(c)) {
+                    j += Character.getNumericValue(c);
+                } else {
+                    pieces.put(new Vec2(7 - i, j), new Piece(PieceType.fromNotation(Character.toUpperCase(c)), Character.isUpperCase(c)));
+                    j++;
+                }
+            }
+        }
     }
 
     private String getShortFen() {
@@ -513,39 +519,18 @@ public class Board implements Cloneable {
         Piece piece = pieces.get(from);
         if (piece == null)
             throw new IllegalArgumentException("Illegal move: " + from.getName() + to.getName() + " (no piece at " + from.getName() + ")");
+        if (!piece.isWhite()) moveNumber++;
+        String fen = getShortFen();
 
-        String notation = piece.type().getNotation() + (occupied(to) || (to.equals(enCroissant) && piece.type() == PieceType.PAWN) ? "x" : "") + to.getName();
-        if (isMainBoard) {
-            if (notation.startsWith("P")) {
-                notation = notation.substring(1);
-                if (notation.startsWith("x")) notation = from.getName().charAt(0) + notation;
-            } else {
-                List<Vec2> otherPieces = canOtherPiecesGetTo(from, to, piece);
-                if (!otherPieces.isEmpty()) {
-                    if (otherPieces.size() == 1) {
-                        notation = String.valueOf(notation.charAt(0)) + from.getName().charAt((otherPieces.get(0).getName().charAt(0) != from.getName().charAt(0)) ? 0 : 1) + notation.substring(1);
-                    } else {
-                        boolean sameFile = false;
-                        boolean sameRank = false;
-                        for (Vec2 pos : otherPieces) {
-                            if (pos.getName().charAt(0) == from.getName().charAt(0)) sameFile = true;
-                            if (pos.getName().charAt(1) == from.getName().charAt(1)) sameRank = true;
-                        }
-                        String temp = "";
-                        temp += notation.charAt(0);
-                        if (sameFile) temp += from.getName().charAt(0);
-                        if (sameRank) temp += from.getName().charAt(1);
-                        temp += notation.substring(1);
-                        notation = temp;
-                    }
-                }
-            }
-        }
+        String notation = "";
+        if (isMainBoard) notation = makeNotation(piece, from, to);
 
+        // 50 moves rule
         if (occupied(to) || piece.type().equals(PieceType.PAWN)) movesWithoutCaptureOrPawnMove = 0;
         else movesWithoutCaptureOrPawnMove++;
         if (movesWithoutCaptureOrPawnMove >= 100) result = Result.DRAWBYFIFTYMOVESRULE;
 
+        // promotion and en croissant
         if (piece.type().equals(PieceType.PAWN)) {
             if ((to.getX() == 0 && !piece.isWhite()) || (to.getX() == 7 && piece.isWhite())) {
                 if (promotion != null) {
@@ -566,25 +551,22 @@ public class Board implements Cloneable {
             }
         } else enCroissant = null;
 
+        //castling
         if (piece.type().equals(PieceType.KING)) {
             if (from.equals(new Vec2(0, 4)) && to.equals(new Vec2(0, 6))) {
-                Piece rook = pieces.remove(new Vec2(0, 7));
-                pieces.put(new Vec2(0, 5), rook);
+                pieces.put(new Vec2(0, 5), pieces.remove(new Vec2(0, 7)));
                 notation = "O-O";
             }
             if (from.equals(new Vec2(0, 4)) && to.equals(new Vec2(0, 2))) {
-                Piece rook = pieces.remove(new Vec2(0, 0));
-                pieces.put(new Vec2(0, 3), rook);
+                pieces.put(new Vec2(0, 3), pieces.remove(new Vec2(0, 0)));
                 notation = "O-O-O";
             }
             if (from.equals(new Vec2(7, 4)) && to.equals(new Vec2(7, 6))) {
-                Piece rook = pieces.remove(new Vec2(7, 7));
-                pieces.put(new Vec2(7, 5), rook);
+                pieces.put(new Vec2(7, 5), pieces.remove(new Vec2(7, 7)));
                 notation = "O-O";
             }
             if (from.equals(new Vec2(7, 4)) && to.equals(new Vec2(7, 2))) {
-                Piece rook = pieces.remove(new Vec2(7, 0));
-                pieces.put(new Vec2(7, 3), rook);
+                pieces.put(new Vec2(7, 3), pieces.remove(new Vec2(7, 0)));
                 notation = "O-O-O";
             }
 
@@ -611,18 +593,14 @@ public class Board implements Cloneable {
             } else {
                 if (isStalemate()) result = Result.DRAWBYSTALEMATE;
                 if (isInCheck(!piece.isWhite())) notation += "+";
-
             }
 
-            String fen = getShortFen();
             Move move = new Move(from, to, piece, notation, promotion, fen);
             moveHistory.add(move);
 
             if (isInsufficientMaterial()) result = Result.DRAWBYINSUFFICIENTMATERIAL;
-            checkIfRepetition(fen);
-            if (!piece.isWhite()) moveNumber++;
+            checkIfRepetition(getShortFen());
             Sound.moveSound(move);
-            System.out.println(movesWithoutCaptureOrPawnMove);
         }
     }
 
@@ -654,7 +632,7 @@ public class Board implements Cloneable {
     }
 
     private void checkIfRepetition(String fen) {
-        int repetition = 0;
+        int repetition = 1;
         for (Move m : moveHistory) {
             if (m.fen().equals(fen)) repetition++;
         }
@@ -668,6 +646,39 @@ public class Board implements Cloneable {
             }
         }
         throw new IllegalStateException("No king found");
+    }
+
+    private String makeNotation(Piece piece, Vec2 from, Vec2 to) {
+        String notation = piece.type().getNotation() + (occupied(to) || (to.equals(enCroissant) && piece.type() == PieceType.PAWN) ? "x" : "") + to.getName();
+        if (notation.startsWith("P")) {
+            notation = notation.substring(1);
+            if (notation.startsWith("x")) notation = from.getName().charAt(0) + notation;
+        } else {
+            List<Vec2> otherPieces = canOtherPiecesGetTo(from, to, piece);
+            if (!otherPieces.isEmpty()) {
+                if (otherPieces.size() == 1) {
+                    notation = String.valueOf(notation.charAt(0)) + from.getName().charAt((otherPieces.get(0).getName().charAt(0) != from.getName().charAt(0)) ? 0 : 1) + notation.substring(1);
+                } else {
+                    boolean sameFile = false;
+                    boolean sameRank = false;
+                    for (Vec2 pos : otherPieces) {
+                        if (pos.getName().charAt(0) == from.getName().charAt(0)) sameFile = true;
+                        if (pos.getName().charAt(1) == from.getName().charAt(1)) sameRank = true;
+                    }
+                    String temp = "";
+                    temp += notation.charAt(0);
+                    if (sameFile) temp += from.getName().charAt(0);
+                    if (sameRank) temp += from.getName().charAt(1);
+                    temp += notation.substring(1);
+                    notation = temp;
+                }
+            }
+        }
+        return notation;
+    }
+
+    public List<Move> getMoveHistory() {
+        return moveHistory;
     }
 
     @Override

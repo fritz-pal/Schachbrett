@@ -2,9 +2,7 @@ package de.hhn.schach.frontend;
 
 import de.hhn.schach.Board;
 import de.hhn.schach.Game;
-import de.hhn.schach.utils.Result;
-import de.hhn.schach.utils.TileIcon;
-import de.hhn.schach.utils.Vec2;
+import de.hhn.schach.utils.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,8 +14,9 @@ public class Window extends JFrame {
     private final Game game;
     private final List<Tile> tiles = new ArrayList<>();
     private final boolean maximized;
-    JPanel boardPanel = new JPanel();
-
+    private final JPanel boardPanel = new JPanel();
+    private int goBack = 0;
+    private long lastKeyPress = 0;
 
     public Window(Game game, boolean maximized) {
         super();
@@ -61,6 +60,7 @@ public class Window extends JFrame {
     }
 
     public void update() {
+        goBack = 0;
         Board board = game.getMainBoard();
         List<Vec2> legalMoves = board.getAllLegalMoves(game.getSelectedTile());
 
@@ -90,6 +90,26 @@ public class Window extends JFrame {
         }
     }
 
+    public void displayFen(String fen) {
+        for (Tile tile : tiles) tile.update(null, false, false, null);
+        String[] fenParts = fen.split(" ");
+        String[] fenRows = fenParts[0].split("/");
+        for (int x = 0; x < 8; x++) {
+            String fenRow = fenRows[x];
+            int y = 0;
+            for (char c : fenRow.toCharArray()) {
+                if (Character.isDigit(c)) {
+                    y += Integer.parseInt(String.valueOf(c));
+                } else {
+                    Vec2 pos = new Vec2(x, y);
+                    Tile tile = getTile(pos);
+                    tile.update(new Piece(PieceType.fromNotation(c), Character.isUpperCase(c)), false, false, null);
+                    y++;
+                }
+            }
+        }
+    }
+
     public Tile getTile(Vec2 pos) {
         for (Tile tile : tiles) {
             if (tile.getPos().equals(pos)) return tile;
@@ -113,8 +133,38 @@ public class Window extends JFrame {
         return new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                System.out.println(e.getKeyCode());
                 switch (e.getKeyCode()) {
+                    case 37 -> {
+                        if (System.currentTimeMillis() - lastKeyPress < 50) break;
+                        List<Move> moves = game.getMainBoard().getMoveHistory();
+                        if (moves.size() - goBack > 0) {
+                            goBack++;
+                            Move move = moves.get(moves.size() - goBack);
+                            displayFen(move.fen());
+                            Sound.moveSound(move);
+                        }
+                        lastKeyPress = System.currentTimeMillis();
+                    }
+                    case 39 -> {
+                        if (System.currentTimeMillis() - lastKeyPress < 50) break;
+                        List<Move> moves = game.getMainBoard().getMoveHistory();
+                        if (goBack > 1) {
+                            goBack--;
+                            Move move = moves.get(moves.size() - goBack);
+                            displayFen(move.fen());
+                            Sound.moveSound(moves.get(moves.size() - goBack - 1));
+                        } else if (goBack == 1) {
+                            goBack--;
+                            Sound.moveSound(moves.get(moves.size() - 1));
+                            update();
+                        }
+                        lastKeyPress = System.currentTimeMillis();
+                    }
                     case 122 -> maximize();
+                    case 38 -> {
+                        if (goBack > 0) update();
+                    }
                     case 27 -> {
                         game.setSelectedTile(null);
                         update();
@@ -126,9 +176,7 @@ public class Window extends JFrame {
 
     private WindowStateListener windowStateListener() {
         return windowEvent -> {
-            if (windowEvent.getNewState() == JFrame.MAXIMIZED_BOTH) {
-                maximize();
-            }
+            if (windowEvent.getNewState() == JFrame.MAXIMIZED_BOTH) maximize();
         };
     }
 
