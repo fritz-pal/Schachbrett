@@ -28,6 +28,18 @@ public enum Result {
         };
     }
 
+    public boolean whiteWon() {
+        return this == WHITEWONBYCHECKMATE || this == WHITEWONBYRESIGNATION;
+    }
+
+    public boolean blackWon() {
+        return this == BLACKWONBYCHECKMATE || this == BLACKWONBYRESIGNATION;
+    }
+
+    public boolean isDraw() {
+        return this == DRAWBYSTALEMATE || this == DRAWBYFIFTYMOVESRULE || this == DRAWBYTHREEFOLDREPETITION || this == DRAWBYINSUFFICIENTMATERIAL || this == DRAWBYAGREEMENT;
+    }
+
     public String getNotation() {
         return switch (this) {
             case WHITEWONBYCHECKMATE -> "1-0";

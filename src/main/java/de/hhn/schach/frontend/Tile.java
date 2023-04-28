@@ -2,6 +2,7 @@ package de.hhn.schach.frontend;
 
 import de.hhn.schach.Game;
 import de.hhn.schach.utils.Piece;
+import de.hhn.schach.utils.TileIcon;
 import de.hhn.schach.utils.Vec2;
 
 import javax.swing.*;
@@ -23,7 +24,7 @@ public class Tile extends JButton {
     private boolean selected = false;
     private boolean legalMoveIcon = false;
     private boolean check = false;
-    private boolean checkmate = false;
+    private TileIcon icon = null;
 
     public Tile(Game game, Vec2 pos, Window window) {
         this.window = window;
@@ -95,9 +96,9 @@ public class Tile extends JButton {
             ImageIcon pieceImg = new ImageIcon(ImagePath.getPieceImage(piece.type(), piece.isWhite(), game.isRotated(piece.isWhite())));
             imgGraphics.drawImage(pieceImg.getImage(), 0, 0, this.getWidth(), this.getWidth(), null);
         }
-        if (checkmate) {
-            ImageIcon checkmateImg = new ImageIcon(ImagePath.getResource("Checkmate.png"));
-            imgGraphics.drawImage(checkmateImg.getImage(), 0, 0, this.getWidth(), this.getWidth(), null);
+        if (icon != null) {
+            ImageIcon iconImg = new ImageIcon(ImagePath.getResource(icon.getPath()));
+            imgGraphics.drawImage(iconImg.getImage(), 0, 0, this.getWidth(), this.getWidth(), null);
         }
         return new ImageIcon(img);
     }
@@ -106,12 +107,12 @@ public class Tile extends JButton {
         return pos;
     }
 
-    public void update(Piece piece, boolean legalMoveIcon, boolean check, boolean checkmate) {
+    public void update(Piece piece, boolean legalMoveIcon, boolean check, TileIcon icon) {
         this.piece = piece;
         this.selected = pos.equals(game.getSelectedTile());
         this.legalMoveIcon = legalMoveIcon;
         this.check = check;
-        this.checkmate = checkmate;
+        this.icon = icon;
         this.setBackGroundColor();
         this.setIcon(getImg());
     }

@@ -20,8 +20,6 @@ public class Board implements Cloneable {
     private boolean blackCastleQ;
     private boolean blackCastleK;
     private boolean whiteTurn;
-    private boolean checkmate = false;
-    private boolean stalemate = false;
     private Result result = Result.NOTFINISHED;
     private String fromFen = "";
     private int movesWithoutCaptureOrPawnMove = 0;
@@ -259,14 +257,6 @@ public class Board implements Cloneable {
     }
 
     public boolean isCheckmate() {
-        return checkmate;
-    }
-
-    public boolean isStalemate() {
-        return stalemate;
-    }
-
-    public boolean checkIfCheckmate() {
         for (Vec2 pos : pieces.keySet()) {
             if (pieces.get(pos).isWhite() == whiteTurn) {
                 if (!getAllLegalMoves(pos).isEmpty()) {
@@ -277,7 +267,7 @@ public class Board implements Cloneable {
         return isInCheck(whiteTurn);
     }
 
-    public boolean checkIfStalemate() {
+    public boolean isStalemate() {
         for (Vec2 pos : pieces.keySet()) {
             if (pieces.get(pos).isWhite() == whiteTurn) {
                 if (!getAllLegalMoves(pos).isEmpty()) {
@@ -598,17 +588,15 @@ public class Board implements Cloneable {
         pieces.remove(from);
         pieces.put(to, piece);
 
-
         if (isMainBoard) {
-            checkmate = checkIfCheckmate();
-            if (!checkmate) stalemate = checkIfStalemate();
-            if (checkmate) result = whiteTurn ? Result.BLACKWONBYCHECKMATE : Result.WHITEWONBYCHECKMATE;
-            else if (stalemate) result = Result.DRAWBYSTALEMATE;
-            if (isInCheck(!piece.isWhite())) {
-                if (isCheckmate()) notation += "#";
-                else notation += "+";
-            }
+            if (isCheckmate()) {
+                result = whiteTurn ? Result.BLACKWONBYCHECKMATE : Result.WHITEWONBYCHECKMATE;
+                notation += "#";
+            } else {
+                if (isStalemate()) result = Result.DRAWBYSTALEMATE;
+                if (isInCheck(!piece.isWhite())) notation += "+";
 
+            }
 
             String fen = getShortFen();
             Move move = new Move(from, to, piece, notation, promotion, fen);
@@ -618,6 +606,7 @@ public class Board implements Cloneable {
             checkIfRepetition(fen);
             if (!piece.isWhite()) moveNumber++;
             Sound.moveSound(move);
+            System.out.println(movesWithoutCaptureOrPawnMove);
         }
     }
 

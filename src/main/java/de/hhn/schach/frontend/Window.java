@@ -2,6 +2,8 @@ package de.hhn.schach.frontend;
 
 import de.hhn.schach.Board;
 import de.hhn.schach.Game;
+import de.hhn.schach.utils.Result;
+import de.hhn.schach.utils.TileIcon;
 import de.hhn.schach.utils.Vec2;
 
 import javax.swing.*;
@@ -65,11 +67,26 @@ public class Window extends JFrame {
         Vec2 checkPos = null;
         if (board.isWhiteTurn() && board.isInCheck(true)) checkPos = board.getKingPos(true);
         else if (!board.isWhiteTurn() && board.isInCheck(false)) checkPos = board.getKingPos(false);
-        boolean checkmate = board.isCheckmate();
+
+        Vec2 whiteKingPos = null;
+        Vec2 blackKingPos = null;
+        TileIcon whiteIcon = null;
+        TileIcon blackIcon = null;
+        if (board.getResult() != Result.NOTFINISHED) {
+            whiteKingPos = board.getKingPos(true);
+            blackKingPos = board.getKingPos(false);
+            whiteIcon = board.getResult().whiteWon() ? TileIcon.WIN : board.getResult().isDraw() ? TileIcon.DRAW : TileIcon.CHECKMATE;
+            blackIcon = board.getResult().blackWon() ? TileIcon.WIN : board.getResult().isDraw() ? TileIcon.DRAW : TileIcon.CHECKMATE;
+        }
 
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();
-            tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), checkmate && pos.equals(checkPos));
+            if (pos.equals(whiteKingPos))
+                tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), whiteIcon);
+            else if (pos.equals(blackKingPos))
+                tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), blackIcon);
+            else
+                tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), null);
         }
     }
 
