@@ -477,14 +477,16 @@ public class Board implements Cloneable {
         return moves;
     }
 
-    private Vec2 canOtherPieceGetTo(Vec2 from, Vec2 to, Piece piece) {
+    private List<Vec2> canOtherPiecesGetTo(Vec2 from, Vec2 to, Piece piece) {
+        if (piece.type() == PieceType.KING || piece.type() == PieceType.PAWN) return new ArrayList<>();
+        List<Vec2> other = new ArrayList<>();
         for (Vec2 pos : pieces.keySet()) {
             if (pos.equals(from)) continue;
             Piece p = pieces.get(pos);
             if (!p.equals(piece)) continue;
-            if (getAllPseudoLegalMoves(pos).contains(to)) return pos;
+            if (getAllPseudoLegalMoves(pos).contains(to)) other.add(pos);
         }
-        return null;
+        return other;
     }
 
     private List<Vec2> inBoundsAndNotOccupied(Vec2 pos, int x, int y) {
@@ -518,10 +520,24 @@ public class Board implements Cloneable {
                 notation = notation.substring(1);
                 if (notation.startsWith("x")) notation = from.getName().charAt(0) + notation;
             } else {
-                Vec2 otherPiece = canOtherPieceGetTo(from, to, piece);
-                if (otherPiece != null) {
-                    String other = otherPiece.getName();
-                    notation = String.valueOf(notation.charAt(0)) + from.getName().charAt((other.charAt(0) != from.getName().charAt(0)) ? 0 : 1) + notation.substring(1);
+                List<Vec2> otherPieces = canOtherPiecesGetTo(from, to, piece);
+                if (!otherPieces.isEmpty()) {
+                    if (otherPieces.size() == 1) {
+                        notation = String.valueOf(notation.charAt(0)) + from.getName().charAt((otherPieces.get(0).getName().charAt(0) != from.getName().charAt(0)) ? 0 : 1) + notation.substring(1);
+                    } else {
+                        boolean sameFile = false;
+                        boolean sameRank = false;
+                        for (Vec2 pos : otherPieces) {
+                            if (pos.getName().charAt(0) == from.getName().charAt(0)) sameFile = true;
+                            if (pos.getName().charAt(1) == from.getName().charAt(1)) sameRank = true;
+                        }
+                        String temp = "";
+                        temp += notation.charAt(0);
+                        if (sameFile) temp += from.getName().charAt(0);
+                        if (sameRank) temp += from.getName().charAt(1);
+                        temp += notation.substring(1);
+                        notation = temp;
+                    }
                 }
             }
         }
