@@ -133,10 +133,9 @@ public class Window extends JFrame {
         return new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                System.out.println(e.getKeyCode());
+                if (System.currentTimeMillis() - lastKeyPress < 50) return;
                 switch (e.getKeyCode()) {
                     case 37 -> {
-                        if (System.currentTimeMillis() - lastKeyPress < 50) break;
                         List<Move> moves = game.getMainBoard().getMoveHistory();
                         if (moves.size() - goBack > 0) {
                             goBack++;
@@ -144,10 +143,8 @@ public class Window extends JFrame {
                             displayFen(move.fen());
                             Sound.moveSound(move);
                         }
-                        lastKeyPress = System.currentTimeMillis();
                     }
                     case 39 -> {
-                        if (System.currentTimeMillis() - lastKeyPress < 50) break;
                         List<Move> moves = game.getMainBoard().getMoveHistory();
                         if (goBack > 1) {
                             goBack--;
@@ -159,17 +156,24 @@ public class Window extends JFrame {
                             Sound.moveSound(moves.get(moves.size() - 1));
                             update();
                         }
-                        lastKeyPress = System.currentTimeMillis();
                     }
                     case 122 -> maximize();
                     case 38 -> {
                         if (goBack > 0) update();
+                    }
+                    case 40 -> {
+                        List<Move> moves = game.getMainBoard().getMoveHistory();
+                        goBack = moves.size();
+                        if (moves.size() > 0) {
+                            displayFen(game.getMainBoard().getMoveHistory().get(0).fen());
+                        }
                     }
                     case 27 -> {
                         game.setSelectedTile(null);
                         update();
                     }
                 }
+                lastKeyPress = System.currentTimeMillis();
             }
         };
     }
