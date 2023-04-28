@@ -42,15 +42,10 @@ public enum Result {
 
     public String getNotation() {
         return switch (this) {
-            case WHITEWONBYCHECKMATE -> "1-0";
-            case BLACKWONBYCHECKMATE -> "0-1";
-            case BLACKWONBYRESIGNATION -> "0-1";
-            case WHITEWONBYRESIGNATION -> "1-0";
-            case DRAWBYSTALEMATE -> "1/2-1/2";
-            case DRAWBYFIFTYMOVESRULE -> "1/2-1/2";
-            case DRAWBYTHREEFOLDREPETITION -> "1/2-1/2";
-            case DRAWBYINSUFFICIENTMATERIAL -> "1/2-1/2";
-            case DRAWBYAGREEMENT -> "1/2-1/2";
+            case WHITEWONBYCHECKMATE, WHITEWONBYRESIGNATION -> "1-0";
+            case BLACKWONBYCHECKMATE, BLACKWONBYRESIGNATION -> "0-1";
+            case DRAWBYSTALEMATE, DRAWBYFIFTYMOVESRULE, DRAWBYTHREEFOLDREPETITION, DRAWBYINSUFFICIENTMATERIAL, DRAWBYAGREEMENT ->
+                    "1/2-1/2";
             case NOTFINISHED -> "*";
         };
     }
