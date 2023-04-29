@@ -81,19 +81,24 @@ public class Window extends JFrame {
             blackIcon = board.getResult().blackWon() ? TileIcon.WIN : board.getResult().isDraw() ? TileIcon.DRAW : TileIcon.CHECKMATE;
         }
 
+        Move lastMove = board.getLastMove();
+
         for (Tile tile : tiles) {
             Vec2 pos = tile.getPos();
+            boolean selected = lastMove != null && (lastMove.from().equals(pos) || lastMove.to().equals(pos)) || pos.equals(game.getSelectedTile());
+
             if (pos.equals(whiteKingPos))
-                tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), whiteIcon);
+                tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), whiteIcon, selected);
             else if (pos.equals(blackKingPos))
-                tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), blackIcon);
+                tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), blackIcon, selected);
             else
-                tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), null);
+                tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), null, selected);
         }
     }
 
-    public void displayFen(String fen) {
-        for (Tile tile : tiles) tile.update(null, false, false, null);
+    public void displayFen(String fen, Move move) {
+        for (Tile tile : tiles)
+            tile.update(null, false, false, null, move != null && (move.to().equals(tile.getPos()) || move.from().equals(tile.getPos())));
         String[] fenParts = fen.split(" ");
         String[] fenRows = fenParts[0].split("/");
         for (int x = 0; x < 8; x++) {
@@ -105,7 +110,7 @@ public class Window extends JFrame {
                 } else {
                     Vec2 pos = new Vec2(x, y);
                     Tile tile = getTile(pos);
-                    tile.update(new Piece(PieceType.fromNotation(c), Character.isUpperCase(c)), false, false, null);
+                    tile.update(new Piece(PieceType.fromNotation(c), Character.isUpperCase(c)), false, false, null, move != null && (move.to().equals(pos) || move.from().equals(pos)));
                     y++;
                 }
             }
@@ -135,17 +140,16 @@ public class Window extends JFrame {
         return new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (System.currentTimeMillis() - lastKeyPress < 50) return;
+                if (System.currentTimeMillis() - lastKeyPress < 20) return;
                 switch (e.getKeyCode()) {
-                    case 32 -> {
-                        new InGameMenu(game);
-                    }
+                    case 32 -> new InGameMenu(game);
                     case 37 -> {
                         List<Move> moves = game.getMainBoard().getMoveHistory();
                         if (moves.size() - goBack > 0) {
                             goBack++;
                             Move move = moves.get(moves.size() - goBack);
-                            displayFen(move.fen());
+                            if (moves.size() - goBack > 1) displayFen(move.fen(), moves.get(moves.size() - goBack - 1));
+                            else displayFen(move.fen(), null);
                             Sound.moveSound(move);
                         }
                     }
@@ -154,11 +158,12 @@ public class Window extends JFrame {
                         if (goBack > 1) {
                             goBack--;
                             Move move = moves.get(moves.size() - goBack);
-                            displayFen(move.fen());
+
+                            displayFen(move.fen(), moves.get(moves.size() - goBack - 1));
                             Sound.moveSound(moves.get(moves.size() - goBack - 1));
                         } else if (goBack == 1) {
                             goBack--;
-                            Sound.moveSound(moves.get(moves.size() - 1));
+                            Sound.moveSound(game.getMainBoard().getLastMove());
                             update();
                         }
                     }
@@ -170,7 +175,7 @@ public class Window extends JFrame {
                         List<Move> moves = game.getMainBoard().getMoveHistory();
                         goBack = moves.size();
                         if (moves.size() > 0) {
-                            displayFen(game.getMainBoard().getMoveHistory().get(0).fen());
+                            displayFen(game.getMainBoard().getMoveHistory().get(0).fen(), null);
                         }
                     }
                     case 27 -> {

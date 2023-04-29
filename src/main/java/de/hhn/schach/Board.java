@@ -688,8 +688,10 @@ public class Board implements Cloneable {
     }
 
     public void resign() {
-        result = whiteTurn ? Result.BLACKWONBYRESIGNATION : Result.WHITEWONBYRESIGNATION;
-        game.endGame();
+        if (result == Result.NOTFINISHED) {
+            result = whiteTurn ? Result.BLACKWONBYRESIGNATION : Result.WHITEWONBYRESIGNATION;
+            game.endGame();
+        }
     }
 
     public void offerDraw() {
@@ -702,5 +704,10 @@ public class Board implements Cloneable {
 
     public boolean isCustomFen() {
         return !fromFen.isEmpty();
+    }
+
+    public Move getLastMove() {
+        if (moveHistory.isEmpty()) return null;
+        return moveHistory.get(moveHistory.size() - 1);
     }
 }

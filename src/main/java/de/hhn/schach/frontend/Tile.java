@@ -107,9 +107,9 @@ public class Tile extends JButton {
         return pos;
     }
 
-    public void update(Piece piece, boolean legalMoveIcon, boolean check, TileIcon icon) {
+    public void update(Piece piece, boolean legalMoveIcon, boolean check, TileIcon icon, boolean selected) {
         this.piece = piece;
-        this.selected = pos.equals(game.getSelectedTile());
+        this.selected = selected;
         this.legalMoveIcon = legalMoveIcon;
         this.check = check;
         this.icon = icon;
