@@ -41,12 +41,23 @@ public class Window extends JFrame {
         this.getContentPane().setPreferredSize(new Dimension(800, 800));
         this.pack();
 
-        for (int x = 7; x >= 0; x--) {
-            for (int y = 0; y < 8; y++) {
-                Vec2 pos = new Vec2(x, y);
-                Tile tile = new Tile(game, pos, this);
-                this.tiles.add(tile);
-                boardPanel.add(tile);
+        if (game.isRotatedBoard()) {
+            for (int x = 0; x < 8; x++) {
+                for (int y = 7; y >= 0; y--) {
+                    Vec2 pos = new Vec2(x, y);
+                    Tile tile = new Tile(game, pos, this);
+                    this.tiles.add(tile);
+                    boardPanel.add(tile);
+                }
+            }
+        } else {
+            for (int x = 7; x >= 0; x--) {
+                for (int y = 0; y < 8; y++) {
+                    Vec2 pos = new Vec2(x, y);
+                    Tile tile = new Tile(game, pos, this);
+                    this.tiles.add(tile);
+                    boardPanel.add(tile);
+                }
             }
         }
 

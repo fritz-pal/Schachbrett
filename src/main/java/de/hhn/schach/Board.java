@@ -191,28 +191,14 @@ public class Board implements Cloneable {
     }
 
     public List<Vec2> getAllLegalMoves(Vec2 pos) {
+        List<Vec2> moves = new ArrayList<>();
+        if (pos == null || !occupied(pos)) return moves;
+
+        moves = getAllPseudoLegalMoves(pos);
+        moves.addAll(getCastleMoves(pos));
+
         List<Vec2> result = new ArrayList<>();
-        if (pos == null) return result;
-        if (!occupied(pos)) return result;
-
-        if (pos.equals(new Vec2(0, 4)) && whiteTurn && !isInCheck(true)) {
-            if (whiteCastleK && !occupied(new Vec2(0, 5)) && !occupied(new Vec2(0, 6)) && !ableToTakeKing(pos, new Vec2(0, 5))) {
-                result.add(new Vec2(0, 6));
-            }
-            if (whiteCastleQ && !occupied(new Vec2(0, 3)) && !occupied(new Vec2(0, 2)) && !occupied(new Vec2(0, 1)) && !ableToTakeKing(pos, new Vec2(0, 3))) {
-                result.add(new Vec2(0, 2));
-            }
-        }
-        if (pos.equals(new Vec2(7, 4)) && !whiteTurn && !isInCheck(false)) {
-            if (blackCastleK && !occupied(new Vec2(7, 5)) && !occupied(new Vec2(7, 6)) && !ableToTakeKing(pos, new Vec2(7, 5))) {
-                result.add(new Vec2(7, 6));
-            }
-            if (blackCastleQ && !occupied(new Vec2(7, 3)) && !occupied(new Vec2(7, 2)) && !occupied(new Vec2(7, 1)) && !ableToTakeKing(pos, new Vec2(7, 3))) {
-                result.add(new Vec2(7, 2));
-            }
-        }
-
-        for (Vec2 move : getAllPseudoLegalMoves(pos)) {
+        for (Vec2 move : moves) {
             if (ableToTakeKing(pos, move)) continue;
             result.add(move);
         }
@@ -237,6 +223,26 @@ public class Board implements Cloneable {
         }
 
         return moves;
+    }
+
+    private List<Vec2> getCastleMoves(Vec2 pos) {
+        List<Vec2> castleMoves = new ArrayList<>();
+        if (pos.equals(new Vec2(0, 4)) && whiteTurn && !isInCheck(true)) {
+            if (whiteCastleK && !occupied(new Vec2(0, 5)) && !occupied(new Vec2(0, 6)) && !ableToTakeKing(pos, new Vec2(0, 5))) {
+                castleMoves.add(new Vec2(0, 6));
+            }
+            if (whiteCastleQ && !occupied(new Vec2(0, 3)) && !occupied(new Vec2(0, 2)) && !occupied(new Vec2(0, 1)) && !ableToTakeKing(pos, new Vec2(0, 3))) {
+                castleMoves.add(new Vec2(0, 2));
+            }
+        } else if (pos.equals(new Vec2(7, 4)) && !whiteTurn && !isInCheck(false)) {
+            if (blackCastleK && !occupied(new Vec2(7, 5)) && !occupied(new Vec2(7, 6)) && !ableToTakeKing(pos, new Vec2(7, 5))) {
+                castleMoves.add(new Vec2(7, 6));
+            }
+            if (blackCastleQ && !occupied(new Vec2(7, 3)) && !occupied(new Vec2(7, 2)) && !occupied(new Vec2(7, 1)) && !ableToTakeKing(pos, new Vec2(7, 3))) {
+                castleMoves.add(new Vec2(7, 2));
+            }
+        }
+        return castleMoves;
     }
 
     private List<Vec2> getKingMoves(Vec2 pos) {

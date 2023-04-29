@@ -70,6 +70,10 @@ public class Game {
         window.update();
     }
 
+    public boolean isRotatedBoard() {
+        return rotatedBoard;
+    }
+
     public Vec2 getSelectedTile() {
         return selectedTile;
     }
