@@ -1,11 +1,14 @@
 package de.hhn.schach.frontend;
 
+import de.hhn.schach.Board;
 import de.hhn.schach.Game;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class InGameMenu extends JFrame {
 
@@ -26,22 +29,28 @@ public class InGameMenu extends JFrame {
             }
         });
 
+        Board board = game.getMainBoard();
+
         JButton resignButton = new JButton("Resign");
         resignButton.setBounds(50, 50, 300, 50);
         resignButton.setFont(new Font("Arial Black", Font.PLAIN, 24));
         resignButton.setBackground(new Color(0x514e4b));
         resignButton.setForeground(Color.WHITE);
         resignButton.setFocusable(false);
-        resignButton.addActionListener(e -> game.getMainBoard().resign());
+        resignButton.addActionListener(e -> board.resign());
         this.add(resignButton);
 
-        JButton drawButton = new JButton("Offer/Accept Draw");
+        JButton drawButton = new JButton((board.hasOfferedDraw(!board.isWhiteTurn()) ? "Accept" : "Offer") + " Draw");
+        if (board.hasOfferedDraw(board.isWhiteTurn())) drawButton.setText("Draw Offered");
         drawButton.setBounds(50, 125, 300, 50);
         drawButton.setFont(new Font("Arial Black", Font.PLAIN, 24));
         drawButton.setBackground(new Color(0x514e4b));
         drawButton.setForeground(Color.WHITE);
         drawButton.setFocusable(false);
-        drawButton.addActionListener(e -> game.getMainBoard().offerDraw());
+        drawButton.addActionListener(e -> {
+            board.offerDraw();
+            if (drawButton.getText().equals("Offer Draw")) drawButton.setText("Draw Offered");
+        });
         this.add(drawButton);
 
         JButton infoButton = new JButton("Info");
@@ -64,6 +73,15 @@ public class InGameMenu extends JFrame {
             this.dispose();
         });
         this.add(exitButton);
+
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == 32) {
+                    InGameMenu.this.dispose();
+                }
+            }
+        });
 
         this.setVisible(true);
     }

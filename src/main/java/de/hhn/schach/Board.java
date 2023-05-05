@@ -24,6 +24,8 @@ public class Board implements Cloneable {
     private String fromFen = "";
     private int movesWithoutCaptureOrPawnMove = 0;
     private int moveNumber = 1;
+    private boolean whiteOfferedDraw = false;
+    private boolean blackOfferedDraw = false;
 
     public Board(Game game, String fen) {
         this.game = game;
@@ -600,6 +602,8 @@ public class Board implements Cloneable {
                 if (isStalemate()) result = Result.DRAWBYSTALEMATE;
                 if (isInCheck(!piece.isWhite())) notation += "+";
             }
+            if (!whiteTurn) blackOfferedDraw = false;
+            else whiteOfferedDraw = false;
 
             Move move = new Move(from, to, piece, notation, promotion, fen);
             moveHistory.add(move);
@@ -700,8 +704,26 @@ public class Board implements Cloneable {
         }
     }
 
+    public boolean hasOfferedDraw(boolean white) {
+        return white ? whiteOfferedDraw : blackOfferedDraw;
+    }
+
     public void offerDraw() {
-        //TODO
+        if (whiteTurn) {
+            if (blackOfferedDraw) {
+                result = Result.DRAWBYAGREEMENT;
+                game.endGame();
+                return;
+            }
+            whiteOfferedDraw = true;
+        } else {
+            if (whiteOfferedDraw) {
+                result = Result.DRAWBYAGREEMENT;
+                game.endGame();
+                return;
+            }
+            blackOfferedDraw = true;
+        }
     }
 
     public Result getResult() {
