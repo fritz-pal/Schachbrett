@@ -34,7 +34,7 @@ public class StartScreen extends JFrame {
         this.add(imageLabel);
 
         JLabel difficultyLabel = new JLabel("Difficulty: 1350");
-        difficultyLabel.setBounds(250, 300, 200, 50);
+        difficultyLabel.setBounds(250, 310, 200, 50);
         difficultyLabel.setFont(new Font("Arial Black", Font.PLAIN, 14));
         difficultyLabel.setForeground(Color.WHITE);
         difficultyLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -42,7 +42,7 @@ public class StartScreen extends JFrame {
         this.getContentPane().add(difficultyLabel, 1);
 
         JSlider difficultySlider = new JSlider(JSlider.HORIZONTAL, 0, 20, 0);
-        difficultySlider.setBounds(250, 300, 200, 20);
+        difficultySlider.setBounds(250, 310, 200, 20);
         difficultySlider.setBackground(new Color(0x312e2b));
         difficultySlider.addChangeListener(e -> difficultyLabel.setText("Difficulty: " + Game.map(difficultySlider.getValue())));
         difficultySlider.setVisible(false);
@@ -51,14 +51,17 @@ public class StartScreen extends JFrame {
         JCheckBox rotatedPieces = makeCheckbox("Rotated pieces");
         JCheckBox rotatedBoard = makeCheckbox("Rotated board");
         JCheckBox singlePlayer = makeCheckbox("Singleplayer");
+        JCheckBox evalBar = makeCheckbox("Eval bar");
+        evalBar.setVisible(false);
         singlePlayer.addActionListener(e -> {
             difficultySlider.setVisible(singlePlayer.isSelected());
             difficultyLabel.setVisible(singlePlayer.isSelected());
+            evalBar.setVisible(singlePlayer.isSelected());
         });
 
         JTextField fenInput = new JTextField("");
         fenInput.setToolTipText("Custom Position (Fen)");
-        fenInput.setBounds(50, 475, 400, 25);
+        fenInput.setBounds(50, 490, 400, 25);
         fenInput.setBackground(new Color(0x514e4b));
         fenInput.setForeground(Color.WHITE);
         fenInput.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -109,7 +112,7 @@ public class StartScreen extends JFrame {
         this.getContentPane().add(blackElo, 0);
 
         JLabel fenLabel = new JLabel("FEN");
-        fenLabel.setBounds(50, 450, 50, 25);
+        fenLabel.setBounds(50, 465, 50, 25);
         fenLabel.setFont(new Font("Arial Black", Font.PLAIN, 14));
         fenLabel.setForeground(Color.WHITE);
         this.getContentPane().add(fenLabel, 0);
@@ -151,7 +154,8 @@ public class StartScreen extends JFrame {
                             blackPlayerName.getText(),
                             whiteElo.getText().equals("") ? -1 : Integer.parseInt(whiteElo.getText()),
                             blackElo.getText().equals("") ? -1 : Integer.parseInt(blackElo.getText()),
-                            singlePlayer.isSelected() ? difficultySlider.getValue() : -1);
+                            singlePlayer.isSelected() ? difficultySlider.getValue() : -1,
+                            singlePlayer.isSelected() && evalBar.isSelected());
                 } else {
                     errorLabel.setText("Invalid FEN!");
                 }

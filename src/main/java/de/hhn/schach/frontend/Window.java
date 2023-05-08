@@ -15,6 +15,7 @@ public class Window extends JFrame {
     private final List<Tile> tiles = new ArrayList<>();
     private final boolean maximized;
     private final JPanel boardPanel = new JPanel();
+    private EvalBar evalBar = null;
     private int goBack = 0;
     private long lastKeyPress = 0;
 
@@ -23,10 +24,10 @@ public class Window extends JFrame {
         this.game = game;
         this.maximized = maximized;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.setSize(800, 800);
+        this.setSize(game.isWithEval() ? 920 : 800, 800);
         this.setLocationRelativeTo(null);
         this.setLayout(null);
-        this.getContentPane().setMinimumSize(new Dimension(400, 400));
+        this.setMinimumSize(new Dimension(416, 439));
         this.setTitle("Chess");
         this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
         this.getContentPane().setBackground(new Color(0x312e2b));
@@ -38,7 +39,7 @@ public class Window extends JFrame {
         this.getContentPane().addKeyListener(keyListener());
         this.getContentPane().setFocusable(true);
         this.getContentPane().requestFocusInWindow();
-        this.getContentPane().setPreferredSize(new Dimension(800, 800));
+        this.getContentPane().setPreferredSize(new Dimension(game.isWithEval() ? 920 : 800, 800));
         this.pack();
 
         if (game.isRotatedBoard()) {
@@ -60,14 +61,26 @@ public class Window extends JFrame {
                 }
             }
         }
+        if (game.isWithEval())
+            evalBar = new EvalBar(this);
 
-        if (!maximized)
+        if (!maximized) {
             boardPanel.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2, (this.getContentPane().getHeight() - getBoardSize()) / 2, getBoardSize(), getBoardSize());
-        else
+            if (game.isWithEval())
+                evalBar.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2 - 50, (this.getContentPane().getHeight() - getBoardSize()) / 2, 40, getBoardSize());
+        } else {
             boardPanel.setBounds((Toolkit.getDefaultToolkit().getScreenSize().width - getBoardSize()) / 2, 0, getBoardSize(), getBoardSize());
-
+            if (game.isWithEval())
+                evalBar.setBounds((Toolkit.getDefaultToolkit().getScreenSize().width - getBoardSize()) / 2 - 50, 0, 40, getBoardSize());
+        }
         boardPanel.setLayout(new GridLayout(8, 8));
         this.getContentPane().add(boardPanel);
+        if (game.isWithEval() && game.getMainBoard().getResult() == Result.NOTFINISHED) {
+            this.getContentPane().add(evalBar);
+            if (game.getUci() != null)
+                evalBar.setEval(game.getUci().getCp(), game.getUci().getMate());
+        }
+
 
         this.setVisible(true);
     }
@@ -138,12 +151,23 @@ public class Window extends JFrame {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        if (!maximized)
+        if (!maximized) {
             boardPanel.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2, (this.getContentPane().getHeight() - getBoardSize()) / 2, getBoardSize(), getBoardSize());
+            if (game.isWithEval()) {
+                evalBar.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2 - 50, (this.getContentPane().getHeight() - getBoardSize()) / 2, 40, getBoardSize());
+                if (game.getUci() != null && game.getMainBoard().getResult() == Result.NOTFINISHED)
+                    evalBar.setEval(game.getUci().getCp(), game.getUci().getMate());
+            }
+        }
         update();
     }
 
-    private int getBoardSize() {
+    public void receivedEval(int cp, int mate) {
+        if (game.isWithEval() && game.getMainBoard().getResult() == Result.NOTFINISHED)
+            evalBar.setEval(cp, mate);
+    }
+
+    public int getBoardSize() {
         return !maximized ? Math.min(this.getContentPane().getWidth(), this.getContentPane().getHeight()) : Toolkit.getDefaultToolkit().getScreenSize().height;
     }
 
@@ -219,5 +243,9 @@ public class Window extends JFrame {
         game.setWindow(window);
         window.update();
         Window.this.dispose();
+    }
+
+    public void setEvalEndResult() {
+        evalBar.setEndResult(game.getMainBoard().getResult());
     }
 }

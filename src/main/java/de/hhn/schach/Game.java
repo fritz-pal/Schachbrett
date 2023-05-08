@@ -23,13 +23,14 @@ public class Game {
     private final UCIProtocol uci;
     private final boolean againstEngine;
     private final int difficulty;
+    private final boolean withEval;
     private Window window;
     private State state;
     private Vec2 selectedTile = null;
     private EndScreen endScreen = null;
     private String engineName = "Stockfish";
 
-    public Game(boolean rotatedPieces, boolean rotatedBoard, boolean againstEngine, String fen, String whiteName, String blackName, int whiteElo, int blackElo, int difficulty) {
+    public Game(boolean rotatedPieces, boolean rotatedBoard, boolean againstEngine, String fen, String whiteName, String blackName, int whiteElo, int blackElo, int difficulty, boolean withEval) {
         this.whiteName = whiteName;
         this.blackName = blackName;
         this.difficulty = difficulty;
@@ -38,6 +39,7 @@ public class Game {
         this.againstEngine = againstEngine;
         this.rotatedPieces = rotatedPieces;
         this.rotatedBoard = rotatedBoard;
+        this.withEval = withEval;
         mainBoard = new Board(this, fen);
         window = new Window(this, false);
         window.update();
@@ -90,6 +92,14 @@ public class Game {
         this.window = window;
     }
 
+    public boolean isWithEval() {
+        return withEval;
+    }
+
+    public UCIProtocol getUci() {
+        return uci;
+    }
+
     public int getEngineDifficulty() {
         return difficulty;
     }
@@ -103,6 +113,7 @@ public class Game {
         selectedTile = null;
         this.state = new GameEndedState();
         window.update();
+        window.setEvalEndResult();
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {

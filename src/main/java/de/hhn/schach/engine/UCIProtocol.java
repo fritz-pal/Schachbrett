@@ -69,10 +69,12 @@ public class UCIProtocol {
                         mate = 0;
                         cp = Integer.parseInt(params[i + 2]);
                         if (!game.isEngineWhite()) cp *= -1;
+                        game.getWindow().receivedEval(cp, mate);
                     }
                     if (params[i].equals("score") && params[i + 1].equals("mate")) {
                         mate = Integer.parseInt(params[i + 2]);
                         if (!game.isEngineWhite()) mate *= -1;
+                        game.getWindow().receivedEval(cp, mate);
                     }
                 }
             }
@@ -87,6 +89,14 @@ public class UCIProtocol {
         String command = posCommand + " moves" + game.getMainBoard().getAllMovesInEngineNotation();
         sendCommand(command);
         sendCommand("go movetime 2000");
+    }
+
+    public int getCp() {
+        return cp;
+    }
+
+    public int getMate() {
+        return mate;
     }
 
     public void quit() {
