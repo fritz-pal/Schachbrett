@@ -62,7 +62,7 @@ public class Window extends JFrame {
             }
         }
         if (game.isWithEval())
-            evalBar = new EvalBar(this);
+            evalBar = new EvalBar(game, this);
 
         if (!maximized) {
             boardPanel.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2, (this.getContentPane().getHeight() - getBoardSize()) / 2, getBoardSize(), getBoardSize());
@@ -75,7 +75,7 @@ public class Window extends JFrame {
         }
         boardPanel.setLayout(new GridLayout(8, 8));
         this.getContentPane().add(boardPanel);
-        if (game.isWithEval() && game.getMainBoard().getResult() == Result.NOTFINISHED) {
+        if (game.isWithEval()) {
             this.getContentPane().add(evalBar);
             if (game.getUci() != null)
                 evalBar.setEval(game.getUci().getCp(), game.getUci().getMate());
@@ -155,7 +155,7 @@ public class Window extends JFrame {
             boardPanel.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2, (this.getContentPane().getHeight() - getBoardSize()) / 2, getBoardSize(), getBoardSize());
             if (game.isWithEval()) {
                 evalBar.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2 - 50, (this.getContentPane().getHeight() - getBoardSize()) / 2, 40, getBoardSize());
-                if (game.getUci() != null && game.getMainBoard().getResult() == Result.NOTFINISHED)
+                if (game.getUci() != null)
                     evalBar.setEval(game.getUci().getCp(), game.getUci().getMate());
             }
         }
@@ -163,7 +163,7 @@ public class Window extends JFrame {
     }
 
     public void receivedEval(int cp, int mate) {
-        if (game.isWithEval() && game.getMainBoard().getResult() == Result.NOTFINISHED)
+        if (game.isWithEval())
             evalBar.setEval(cp, mate);
     }
 
@@ -245,7 +245,7 @@ public class Window extends JFrame {
         Window.this.dispose();
     }
 
-    public void setEvalEndResult() {
-        evalBar.setEndResult(game.getMainBoard().getResult());
+    public void setEndEvaluation() {
+        evalBar.setEndResult();
     }
 }

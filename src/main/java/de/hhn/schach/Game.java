@@ -113,7 +113,7 @@ public class Game {
         selectedTile = null;
         this.state = new GameEndedState();
         window.update();
-        window.setEvalEndResult();
+        window.setEndEvaluation();
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
