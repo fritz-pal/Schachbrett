@@ -32,7 +32,7 @@ public class InGameMenu extends JFrame {
         Board board = game.getMainBoard();
 
         JButton resignButton = new JButton("Resign");
-        resignButton.setBounds(50, 50, 300, 50);
+        resignButton.setBounds(50, 40, 300, 50);
         resignButton.setFont(new Font("Arial Black", Font.PLAIN, 24));
         resignButton.setBackground(new Color(0x514e4b));
         resignButton.setForeground(Color.WHITE);
@@ -42,7 +42,7 @@ public class InGameMenu extends JFrame {
 
         JButton drawButton = new JButton((board.hasOfferedDraw(!board.isWhiteTurn()) ? "Accept" : "Offer") + " Draw");
         if (board.hasOfferedDraw(board.isWhiteTurn())) drawButton.setText("Draw Offered");
-        drawButton.setBounds(50, 125, 300, 50);
+        drawButton.setBounds(50, 130, 300, 50);
         drawButton.setFont(new Font("Arial Black", Font.PLAIN, 24));
         drawButton.setBackground(new Color(0x514e4b));
         drawButton.setForeground(Color.WHITE);
@@ -54,16 +54,16 @@ public class InGameMenu extends JFrame {
         this.add(drawButton);
 
         JButton infoButton = new JButton("Info");
-        infoButton.setBounds(50, 200, 300, 50);
+        infoButton.setBounds(50, 220, 300, 50);
         infoButton.setFont(new Font("Arial Black", Font.PLAIN, 24));
         infoButton.setBackground(new Color(0x514e4b));
         infoButton.setForeground(Color.WHITE);
         infoButton.setFocusable(false);
-        infoButton.addActionListener(e -> new EndScreen(game));
+        infoButton.addActionListener(e -> game.endScreen());
         this.add(infoButton);
 
         JButton exitButton = new JButton("Exit");
-        exitButton.setBounds(50, 275, 300, 50);
+        exitButton.setBounds(50, 310, 300, 50);
         exitButton.setFont(new Font("Arial Black", Font.PLAIN, 24));
         exitButton.setBackground(new Color(0x514e4b));
         exitButton.setForeground(Color.WHITE);

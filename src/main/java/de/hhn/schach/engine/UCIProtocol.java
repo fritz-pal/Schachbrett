@@ -15,6 +15,7 @@ public class UCIProtocol {
     private int mate = 0;
     private Process process;
     private String posCommand = "position startpos";
+    private boolean ignoreNextBestMove = false;
 
     public UCIProtocol(Game game, boolean autoStart) {
         this.autoStart = autoStart;
@@ -42,6 +43,7 @@ public class UCIProtocol {
     }
 
     public void sendCommand(String command) {
+        System.out.println("Sending command: " + command);
         try {
             BufferedWriter writer = process.outputWriter();
             writer.write(command + "\n");
@@ -61,19 +63,28 @@ public class UCIProtocol {
                 sendCommand("ucinewgame");
                 if (autoStart) startSearching();
             }
-            case "bestmove" -> game.foundMove(params[0]);
+            case "bestmove" -> {
+                if (ignoreNextBestMove) {
+                    ignoreNextBestMove = false;
+                    return;
+                }
+                game.foundMove(params[0]);
+                ignoreNextBestMove = true;
+                sendCommand(posCommand + " moves" + game.getMainBoard().getAllMovesInEngineNotation());
+                sendCommand("go infinite");
+            }
             case "info" -> {
                 for (int i = 0; i < params.length; i++) {
                     if (params[i].equals("depth")) depth = Integer.parseInt(params[i + 1]);
                     if (params[i].equals("score") && params[i + 1].equals("cp")) {
                         mate = 0;
                         cp = Integer.parseInt(params[i + 2]);
-                        if (!game.isEngineWhite()) cp *= -1;
+                        if (!game.getMainBoard().isWhiteTurn()) cp *= -1;
                         game.getWindow().receivedEval(cp, mate);
                     }
                     if (params[i].equals("score") && params[i + 1].equals("mate")) {
                         mate = Integer.parseInt(params[i + 2]);
-                        if (!game.isEngineWhite()) mate *= -1;
+                        if (!game.getMainBoard().isWhiteTurn()) mate *= -1;
                         game.getWindow().receivedEval(cp, mate);
                     }
                 }
@@ -84,8 +95,8 @@ public class UCIProtocol {
         }
     }
 
-
     public void startSearching() {
+        sendCommand("stop");
         String command = posCommand + " moves" + game.getMainBoard().getAllMovesInEngineNotation();
         sendCommand(command);
         sendCommand("go movetime 2000");

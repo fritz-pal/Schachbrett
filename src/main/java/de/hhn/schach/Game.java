@@ -113,11 +113,11 @@ public class Game {
         selectedTile = null;
         this.state = new GameEndedState();
         window.update();
-        window.setEndEvaluation();
+        if (withEval) window.setEndEvaluation();
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                endScreen = new EndScreen(Game.this);
+                Game.this.endScreen();
             }
         }, 1000);
     }
@@ -173,5 +173,10 @@ public class Game {
         if (uci != null) uci.quit();
         if (window != null) window.dispose();
         if (endScreen != null) endScreen.dispose();
+    }
+
+    public void endScreen() {
+        if (endScreen != null) endScreen.dispose();
+        endScreen = new EndScreen(this);
     }
 }

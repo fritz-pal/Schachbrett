@@ -154,6 +154,7 @@ public class Window extends JFrame {
         if (!maximized) {
             boardPanel.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2, (this.getContentPane().getHeight() - getBoardSize()) / 2, getBoardSize(), getBoardSize());
             if (game.isWithEval()) {
+                evalBar.getWhiteLabel().setBounds(0, evalBar.getHeight() - 40, 40, 40);
                 evalBar.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2 - 50, (this.getContentPane().getHeight() - getBoardSize()) / 2, 40, getBoardSize());
                 if (game.getUci() != null)
                     evalBar.setEval(game.getUci().getCp(), game.getUci().getMate());

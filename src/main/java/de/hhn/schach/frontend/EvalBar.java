@@ -12,7 +12,6 @@ import java.util.Locale;
 public class EvalBar extends JPanel {
     private final JPanel bar = new JPanel();
     private final Game game;
-    private final Window window;
     private final JLabel whiteLabel = new JLabel("0.0");
     private final JLabel blackLabel = new JLabel("0.0");
     private final boolean isRotated;
@@ -21,7 +20,6 @@ public class EvalBar extends JPanel {
     public EvalBar(Game game, Window window) {
         this.isRotated = game.isRotatedBoard();
         this.game = game;
-        this.window = window;
         this.setBounds((window.getContentPane().getWidth() - window.getBoardSize()) / 2 - 50, (window.getContentPane().getHeight() - window.getBoardSize()) / 2, 40, window.getBoardSize());
         this.setBackground(isRotated ? Color.BLACK : Color.WHITE);
         this.setLayout(null);
@@ -53,7 +51,12 @@ public class EvalBar extends JPanel {
             bar.add(blackLabel, 0);
         }
 
-        new Timer(10, event -> bar.setBounds(0, 0, 40, ((isRotated ? (this.getHeight() - interpolation) : interpolation) + bar.getHeight() * 3) / 4)).start();
+        new Timer(10, event -> {
+            if (Math.abs(bar.getHeight() - interpolation) <= 4)
+                bar.setBounds(0, 0, 40, (isRotated ? (this.getHeight() - interpolation) : interpolation));
+            else
+                bar.setBounds(0, 0, 40, ((isRotated ? (this.getHeight() - interpolation) : interpolation) + bar.getHeight() * 3) / 4);
+        }).start();
     }
 
     public void setEval(int cp, int mate) {
@@ -64,12 +67,12 @@ public class EvalBar extends JPanel {
         if (mate != 0) {
             if (mate < 0) {
                 interpolation = this.getHeight();
-                blackLabel.setText("-M" + (isRotated ? Math.abs(mate) - 1 : Math.abs(mate)));
+                blackLabel.setText("-M" + Math.abs(mate));
                 whiteLabel.setVisible(false);
                 blackLabel.setVisible(true);
             } else {
                 interpolation = 0;
-                whiteLabel.setText("M" + (isRotated ? mate : mate - 1));
+                whiteLabel.setText("M" + mate);
                 blackLabel.setVisible(false);
                 whiteLabel.setVisible(true);
             }
@@ -94,7 +97,6 @@ public class EvalBar extends JPanel {
 
     public void setEndResult() {
         Result result = game.getMainBoard().getResult();
-        System.out.println(result);
 
         if (result.whiteWon()) {
             whiteLabel.setText("1-0");
@@ -113,5 +115,9 @@ public class EvalBar extends JPanel {
             whiteLabel.setVisible(true);
             blackLabel.setVisible(true);
         }
+    }
+
+    public JLabel getWhiteLabel() {
+        return whiteLabel;
     }
 }
