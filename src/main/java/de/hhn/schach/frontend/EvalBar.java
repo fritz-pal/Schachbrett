@@ -12,7 +12,7 @@ import java.util.Locale;
 public class EvalBar extends JPanel {
     private final JPanel bar = new JPanel();
     private final Game game;
-    private final JLabel whiteLabel = new JLabel("0.0");
+    private final JLabel whiteLabel = new JLabel("0.3");
     private final JLabel blackLabel = new JLabel("0.0");
     private final boolean isRotated;
     private int interpolation = 0;
@@ -40,6 +40,7 @@ public class EvalBar extends JPanel {
         blackLabel.setFont(new Font("Arial Black", Font.PLAIN, 14));
         blackLabel.setForeground(Color.WHITE);
         blackLabel.setBounds(0, 0, 40, 40);
+        blackLabel.setVisible(false);
 
         if (isRotated) {
             whiteLabel.setBounds(0, 0, 40, 40);
@@ -85,7 +86,7 @@ public class EvalBar extends JPanel {
             blackLabel.setText(String.valueOf((int) (cp / 100f)));
             whiteLabel.setText(String.valueOf((int) (cp / 100f)));
         }
-        if (cp > 0) {
+        if (cp >= 0) {
             blackLabel.setVisible(false);
             whiteLabel.setVisible(true);
         } else {

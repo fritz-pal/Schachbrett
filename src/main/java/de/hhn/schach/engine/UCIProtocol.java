@@ -11,7 +11,7 @@ public class UCIProtocol {
     private final Game game;
     private final boolean autoStart;
     private int depth = 0;
-    private int cp = 0;
+    private int cp = 30;
     private int mate = 0;
     private Process process;
     private String posCommand = "position startpos";
@@ -43,7 +43,6 @@ public class UCIProtocol {
     }
 
     public void sendCommand(String command) {
-        System.out.println("Sending command: " + command);
         try {
             BufferedWriter writer = process.outputWriter();
             writer.write(command + "\n");

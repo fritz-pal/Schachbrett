@@ -132,7 +132,7 @@ public class Window extends JFrame {
                 if (Character.isDigit(c)) {
                     y += Integer.parseInt(String.valueOf(c));
                 } else {
-                    Vec2 pos = new Vec2(x, y);
+                    Vec2 pos = new Vec2(7 - x, y);
                     Tile tile = getTile(pos);
                     tile.update(new Piece(PieceType.fromNotation(c), Character.isUpperCase(c)), false, false, null, move != null && (move.to().equals(pos) || move.from().equals(pos)));
                     y++;

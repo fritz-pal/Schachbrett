@@ -107,7 +107,7 @@ public class Board implements Cloneable {
 
     private String getShortFen() {
         StringBuilder fen = new StringBuilder();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 7; i >= 0; i--) {
             int empty = 0;
             for (int j = 0; j < 8; j++) {
                 Piece piece = pieces.get(new Vec2(i, j));
@@ -124,7 +124,7 @@ public class Board implements Cloneable {
             if (empty > 0) {
                 fen.append(empty);
             }
-            if (i < 7) {
+            if (i > 0) {
                 fen.append("/");
             }
         }
@@ -138,10 +138,10 @@ public class Board implements Cloneable {
         fen.append(whiteTurn ? "w" : "b");
         fen.append(" ");
         if (whiteCastleQ || whiteCastleK || blackCastleQ || blackCastleK) {
-            if (whiteCastleQ) fen.append("Q");
             if (whiteCastleK) fen.append("K");
-            if (blackCastleQ) fen.append("q");
+            if (whiteCastleQ) fen.append("Q");
             if (blackCastleK) fen.append("k");
+            if (blackCastleQ) fen.append("q");
         } else {
             fen.append("-");
         }
