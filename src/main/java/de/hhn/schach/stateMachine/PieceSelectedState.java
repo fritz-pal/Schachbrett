@@ -14,6 +14,19 @@ public class PieceSelectedState implements State {
         this.game = game;
     }
 
+    static boolean promotion(Vec2 pos, Board board, Game game) {
+        if (board.isPromotingMove(game.getSelectedTile(), pos)) {
+            new PromotionWindow(game, board.isWhiteTurn(), pos);
+            return true;
+        }
+        board.move(game.getSelectedTile(), pos, true, null);
+        if (board.getResult() != Result.NOTFINISHED) {
+            game.endGame();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void onTileClick(Vec2 pos) {
         Board board = game.getMainBoard();
@@ -29,13 +42,7 @@ public class PieceSelectedState implements State {
         }
         if (!board.occupied(pos) || board.getPiece(pos).isWhite() != board.isWhiteTurn()) {
             if (board.isLegalMove(game.getSelectedTile(), pos)) {
-                if (board.isPromotingMove(game.getSelectedTile(), pos)) {
-                    new PromotionWindow(game, board.isWhiteTurn(), pos);
-                    return;
-                }
-                board.move(game.getSelectedTile(), pos, true, null);
-                if (board.getResult() != Result.NOTFINISHED) {
-                    game.endGame();
+                if (promotion(pos, board, game)) {
                     return;
                 }
             }

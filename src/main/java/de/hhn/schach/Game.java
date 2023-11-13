@@ -4,11 +4,14 @@ import de.hhn.schach.engine.UCIProtocol;
 import de.hhn.schach.frontend.EndScreen;
 import de.hhn.schach.frontend.Sound;
 import de.hhn.schach.frontend.Window;
-import de.hhn.schach.stateMachine.*;
+import de.hhn.schach.stateMachine.EnginePonderState;
+import de.hhn.schach.stateMachine.GameEndedState;
+import de.hhn.schach.stateMachine.State;
+import de.hhn.schach.stateMachine.TurnAgainstEngineState;
+import de.hhn.schach.stateMachine.TurnState;
 import de.hhn.schach.utils.PieceType;
 import de.hhn.schach.utils.Result;
 import de.hhn.schach.utils.Vec2;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -30,7 +33,9 @@ public class Game {
     private EndScreen endScreen = null;
     private String engineName = "Stockfish";
 
-    public Game(boolean rotatedPieces, boolean rotatedBoard, boolean againstEngine, String fen, String whiteName, String blackName, int whiteElo, int blackElo, int difficulty, boolean withEval) {
+    public Game(boolean rotatedPieces, boolean rotatedBoard, boolean againstEngine, String fen,
+                String whiteName, String blackName, int whiteElo, int blackElo, int difficulty,
+                boolean withEval) {
         this.whiteName = whiteName;
         this.blackName = blackName;
         this.difficulty = difficulty;
@@ -44,14 +49,18 @@ public class Game {
         window = new Window(this, false);
         window.update();
         if (againstEngine) {
-            if (mainBoard.isCustomFen() && (mainBoard.isWhiteTurn() && rotatedBoard || !mainBoard.isWhiteTurn() && !rotatedBoard)) {
+            if (mainBoard.isCustomFen() && (mainBoard.isWhiteTurn() && rotatedBoard ||
+                !mainBoard.isWhiteTurn() && !rotatedBoard)) {
                 engineWhite = !rotatedBoard;
             } else {
                 engineWhite = rotatedBoard;
             }
             uci = new UCIProtocol(this, engineWhite);
-            if (engineWhite) state = new EnginePonderState();
-            else state = new TurnAgainstEngineState(this);
+            if (engineWhite) {
+                state = new EnginePonderState();
+            } else {
+                state = new TurnAgainstEngineState(this);
+            }
         } else {
             engineWhite = false;
             uci = null;
@@ -113,7 +122,9 @@ public class Game {
         selectedTile = null;
         this.state = new GameEndedState();
         window.update();
-        if (withEval) window.setEndEvaluation();
+        if (withEval) {
+            window.setEndEvaluation();
+        }
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -151,11 +162,14 @@ public class Game {
     }
 
     public void foundMove(String notation) {
-        if (notation.equals("0000")) return;
+        if (notation.equals("0000")) {
+            return;
+        }
         uci.printInfo();
         Vec2 from = new Vec2(notation.substring(0, 2));
         Vec2 to = new Vec2(notation.substring(2, 4));
-        mainBoard.move(from, to, true, notation.length() > 4 ? PieceType.fromNotation(notation.charAt(4)) : null);
+        mainBoard.move(from, to, true,
+            notation.length() > 4 ? PieceType.fromNotation(notation.charAt(4)) : null);
         if (mainBoard.getResult() != Result.NOTFINISHED) {
             endGame();
         } else {
@@ -170,13 +184,21 @@ public class Game {
     }
 
     public void stop() {
-        if (uci != null) uci.quit();
-        if (window != null) window.dispose();
-        if (endScreen != null) endScreen.dispose();
+        if (uci != null) {
+            uci.quit();
+        }
+        if (window != null) {
+            window.dispose();
+        }
+        if (endScreen != null) {
+            endScreen.dispose();
+        }
     }
 
     public void endScreen() {
-        if (endScreen != null) endScreen.dispose();
+        if (endScreen != null) {
+            endScreen.dispose();
+        }
         endScreen = new EndScreen(this);
     }
 }

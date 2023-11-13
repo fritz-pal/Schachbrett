@@ -1,9 +1,9 @@
 package de.hhn.schach.stateMachine;
 
+import static de.hhn.schach.stateMachine.PieceSelectedState.promotion;
+
 import de.hhn.schach.Board;
 import de.hhn.schach.Game;
-import de.hhn.schach.frontend.PromotionWindow;
-import de.hhn.schach.utils.Result;
 import de.hhn.schach.utils.Vec2;
 
 public class PieceSelectedAgainstEngineState implements State {
@@ -28,13 +28,7 @@ public class PieceSelectedAgainstEngineState implements State {
         }
         if (!board.occupied(pos) || board.getPiece(pos).isWhite() == game.isEngineWhite()) {
             if (board.isLegalMove(game.getSelectedTile(), pos)) {
-                if (board.isPromotingMove(game.getSelectedTile(), pos)) {
-                    new PromotionWindow(game, board.isWhiteTurn(), pos);
-                    return;
-                }
-                board.move(game.getSelectedTile(), pos, true, null);
-                if (board.getResult() != Result.NOTFINISHED) {
-                    game.endGame();
+                if (promotion(pos, board, game)) {
                     return;
                 }
                 game.startEngine();
