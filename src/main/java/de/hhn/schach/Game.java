@@ -125,6 +125,9 @@ public class Game {
     if (withEval) {
       window.setEndEvaluation();
     }
+    if (againstEngine && mainBoard.getResult().whiteWon() == !engineWhite) {
+      Main.highScore = Math.max(Main.highScore, difficulty);
+    }
     new Timer().schedule(new TimerTask() {
       @Override
       public void run() {

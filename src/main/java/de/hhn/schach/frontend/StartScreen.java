@@ -6,6 +6,8 @@ import de.hhn.schach.Main;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -28,6 +30,12 @@ public class StartScreen extends JFrame {
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setLocationRelativeTo(null);
     this.setIconImage(new ImageIcon(ImagePath.getResource("icon.png")).getImage());
+    this.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent windowEvent) {
+        Main.saveData();
+      }
+    });
 
     JLabel titleLabel = new JLabel("Chess");
     titleLabel.setBounds(200, 10, 100, 50);
@@ -56,6 +64,14 @@ public class StartScreen extends JFrame {
     difficultySlider.setVisible(false);
     this.getContentPane().add(difficultySlider, 0);
 
+    JLabel highestLabel =
+        new JLabel("Defeated: " + (Main.highScore < 0 ? "N/A" : Game.map(Main.highScore)));
+    highestLabel.setBounds(350, 10, 150, 25);
+    highestLabel.setFont(new Font("Arial Black", Font.PLAIN, 14));
+    highestLabel.setForeground(Color.WHITE);
+    highestLabel.setVisible(false);
+    this.getContentPane().add(highestLabel, 0);
+
     JCheckBox rotatedPieces = makeCheckbox("Rotated pieces");
     JCheckBox rotatedBoard = makeCheckbox("Rotated board");
     JCheckBox singlePlayer = makeCheckbox("Singleplayer");
@@ -65,6 +81,7 @@ public class StartScreen extends JFrame {
       difficultySlider.setVisible(singlePlayer.isSelected());
       difficultyLabel.setVisible(singlePlayer.isSelected());
       evalBar.setVisible(singlePlayer.isSelected());
+      highestLabel.setVisible(singlePlayer.isSelected());
     });
 
     JTextField fenInput = new JTextField("");
@@ -154,12 +171,8 @@ public class StartScreen extends JFrame {
         }
         boolean validFen = Board.isValidFen(fenInput.getText());
         if (validFen || fenInput.getText().isEmpty()) {
-          new Game(rotatedPieces.isSelected(),
-              rotatedBoard.isSelected(),
-              singlePlayer.isSelected(),
-              fenInput.getText(),
-              whitePlayerName.getText(),
-              blackPlayerName.getText(),
+          new Game(rotatedPieces.isSelected(), rotatedBoard.isSelected(), singlePlayer.isSelected(),
+              fenInput.getText(), whitePlayerName.getText(), blackPlayerName.getText(),
               whiteElo.getText().isEmpty() ? -1 : Integer.parseInt(whiteElo.getText()),
               blackElo.getText().isEmpty() ? -1 : Integer.parseInt(blackElo.getText()),
               singlePlayer.isSelected() ? difficultySlider.getValue() : -1,

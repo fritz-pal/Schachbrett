@@ -62,7 +62,7 @@ public class EngineSelector extends JFrame {
 
   private void save() {
     Main.enginePath = pathField.getText();
-    Main.saveEnginePath();
+    Main.saveData();
     this.dispose();
   }
 
