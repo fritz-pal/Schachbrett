@@ -75,34 +75,34 @@ public class Window extends JFrame {
         }
       }
     }
-      if (game.isWithEval()) {
-          evalBar = new EvalBar(game, this);
-      }
+    if (game.isWithEval()) {
+      evalBar = new EvalBar(game, this);
+    }
 
     if (!maximized) {
       boardPanel.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2,
           (this.getContentPane().getHeight() - getBoardSize()) / 2, getBoardSize(), getBoardSize());
-        if (game.isWithEval()) {
-            evalBar.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2 - 50,
-                (this.getContentPane().getHeight() - getBoardSize()) / 2, 40, getBoardSize());
-        }
+      if (game.isWithEval()) {
+        evalBar.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2 - 50,
+            (this.getContentPane().getHeight() - getBoardSize()) / 2, 40, getBoardSize());
+      }
     } else {
       boardPanel.setBounds((Toolkit.getDefaultToolkit().getScreenSize().width - getBoardSize()) / 2,
           0, getBoardSize(), getBoardSize());
-        if (game.isWithEval()) {
-            evalBar.setBounds(
-                (Toolkit.getDefaultToolkit().getScreenSize().width - getBoardSize()) / 2 - 50, 0,
-                40,
-                getBoardSize());
-        }
+      if (game.isWithEval()) {
+        evalBar.setBounds(
+            (Toolkit.getDefaultToolkit().getScreenSize().width - getBoardSize()) / 2 - 50, 0,
+            40,
+            getBoardSize());
+      }
     }
     boardPanel.setLayout(new GridLayout(8, 8));
     this.getContentPane().add(boardPanel);
     if (game.isWithEval()) {
       this.getContentPane().add(evalBar);
-        if (game.getUci() != null) {
-            evalBar.setEval(game.getUci().getCp(), game.getUci().getMate());
-        }
+      if (game.getUci() != null) {
+        evalBar.setEval(game.getUci().getCp(), game.getUci().getMate());
+      }
     }
 
 
@@ -115,11 +115,11 @@ public class Window extends JFrame {
     List<Vec2> legalMoves = board.getAllLegalMoves(game.getSelectedTile());
 
     Vec2 checkPos = null;
-      if (board.isWhiteTurn() && board.isInCheck(true)) {
-          checkPos = board.getKingPos(true);
-      } else if (!board.isWhiteTurn() && board.isInCheck(false)) {
-          checkPos = board.getKingPos(false);
-      }
+    if (board.isWhiteTurn() && board.isInCheck(true)) {
+      checkPos = board.getKingPos(true);
+    } else if (!board.isWhiteTurn() && board.isInCheck(false)) {
+      checkPos = board.getKingPos(false);
+    }
 
     Vec2 whiteKingPos = null;
     Vec2 blackKingPos = null;
@@ -142,27 +142,27 @@ public class Window extends JFrame {
           lastMove != null && (lastMove.from().equals(pos) || lastMove.to().equals(pos)) ||
               pos.equals(game.getSelectedTile());
 
-        if (pos.equals(whiteKingPos)) {
-            tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos),
-                whiteIcon,
-                selected);
-        } else if (pos.equals(blackKingPos)) {
-            tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos),
-                blackIcon,
-                selected);
-        } else {
-            tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), null,
-                selected);
-        }
+      if (pos.equals(whiteKingPos)) {
+        tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos),
+            whiteIcon,
+            selected);
+      } else if (pos.equals(blackKingPos)) {
+        tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos),
+            blackIcon,
+            selected);
+      } else {
+        tile.update(board.getPiece(pos), legalMoves.contains(pos), pos.equals(checkPos), null,
+            selected);
+      }
     }
   }
 
   public void displayFen(String fen, Move move) {
-      for (Tile tile : tiles) {
-          tile.update(null, false, false, null,
-              move != null &&
-                  (move.to().equals(tile.getPos()) || move.from().equals(tile.getPos())));
-      }
+    for (Tile tile : tiles) {
+      tile.update(null, false, false, null,
+          move != null &&
+              (move.to().equals(tile.getPos()) || move.from().equals(tile.getPos())));
+    }
     String[] fenParts = fen.split(" ");
     String[] fenRows = fenParts[0].split("/");
     for (int x = 0; x < 8; x++) {
@@ -184,9 +184,9 @@ public class Window extends JFrame {
 
   public Tile getTile(Vec2 pos) {
     for (Tile tile : tiles) {
-        if (tile.getPos().equals(pos)) {
-            return tile;
-        }
+      if (tile.getPos().equals(pos)) {
+        return tile;
+      }
     }
     throw new IllegalArgumentException("Tile not found");
   }
@@ -201,18 +201,18 @@ public class Window extends JFrame {
         evalBar.getWhiteLabel().setBounds(0, evalBar.getHeight() - 40, 40, 40);
         evalBar.setBounds((this.getContentPane().getWidth() - getBoardSize()) / 2 - 50,
             (this.getContentPane().getHeight() - getBoardSize()) / 2, 40, getBoardSize());
-          if (game.getUci() != null) {
-              evalBar.setEval(game.getUci().getCp(), game.getUci().getMate());
-          }
+        if (game.getUci() != null) {
+          evalBar.setEval(game.getUci().getCp(), game.getUci().getMate());
+        }
       }
     }
     update();
   }
 
   public void receivedEval(int cp, int mate) {
-      if (game.isWithEval()) {
-          evalBar.setEval(cp, mate);
-      }
+    if (game.isWithEval()) {
+      evalBar.setEval(cp, mate);
+    }
   }
 
   public int getBoardSize() {
@@ -225,9 +225,9 @@ public class Window extends JFrame {
     return new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-          if (System.currentTimeMillis() - lastKeyPress < 20) {
-              return;
-          }
+        if (System.currentTimeMillis() - lastKeyPress < 20) {
+          return;
+        }
         switch (e.getKeyCode()) {
           case 32 -> new InGameMenu(game);
           case 37 -> {
@@ -235,11 +235,11 @@ public class Window extends JFrame {
             if (moves.size() - goBack > 0) {
               goBack++;
               Move move = moves.get(moves.size() - goBack);
-                if (moves.size() - goBack > 1) {
-                    displayFen(move.fen(), moves.get(moves.size() - goBack - 1));
-                } else {
-                    displayFen(move.fen(), null);
-                }
+              if (moves.size() - goBack > 1) {
+                displayFen(move.fen(), moves.get(moves.size() - goBack - 1));
+              } else {
+                displayFen(move.fen(), null);
+              }
               Sound.moveSound(move);
             }
           }
@@ -259,9 +259,9 @@ public class Window extends JFrame {
           }
           case 122 -> maximize();
           case 38 -> {
-              if (goBack > 0) {
-                  update();
-              }
+            if (goBack > 0) {
+              update();
+            }
           }
           case 40 -> {
             List<Move> moves = game.getMainBoard().getMoveHistory();
@@ -282,9 +282,9 @@ public class Window extends JFrame {
 
   private WindowStateListener windowStateListener() {
     return windowEvent -> {
-        if (windowEvent.getNewState() == JFrame.MAXIMIZED_BOTH) {
-            maximize();
-        }
+      if (windowEvent.getNewState() == JFrame.MAXIMIZED_BOTH) {
+        maximize();
+      }
     };
   }
 

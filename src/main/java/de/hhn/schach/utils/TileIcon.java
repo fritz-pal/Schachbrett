@@ -1,17 +1,17 @@
 package de.hhn.schach.utils;
 
 public enum TileIcon {
-    CHECKMATE("checkmate_icon.png"),
-    DRAW("draw_icon.png"),
-    WIN("win_icon.png");
+  CHECKMATE("checkmate_icon.png"),
+  DRAW("draw_icon.png"),
+  WIN("win_icon.png");
 
-    private final String path;
+  private final String path;
 
-    TileIcon(String path) {
-        this.path = path;
-    }
+  TileIcon(String path) {
+    this.path = path;
+  }
 
-    public String getPath() {
-        return path;
-    }
+  public String getPath() {
+    return path;
+  }
 }
